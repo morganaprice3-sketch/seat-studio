@@ -32,14 +32,6 @@
             <input id="taskTitle" type="text" placeholder="Finalize VIP arrivals script" />
           </label>
           <label>
-            Section
-            <select id="taskSection">
-              <option value="today">Today</option>
-              <option value="milestones">Milestones</option>
-              <option value="countdown">Countdown</option>
-            </select>
-          </label>
-          <label>
             Priority
             <select id="taskPriority">
               <option value="P1">P1 - Critical</option>
@@ -61,34 +53,17 @@
         </div>
       </section>
 
-      <section class="card filters-card">
-        <h2>Focused View</h2>
+      <section class="card list-card">
+        <h2>Tasks</h2>
         <div class="view-actions">
           <button class="pill active" data-view="all">All</button>
           <button class="pill" data-view="unassigned">Unassigned</button>
           <button class="pill" data-view="openP1">Open P1</button>
         </div>
-      </section>
-
-      <section class="card spotlight-card">
-        <h2>Just One Thing</h2>
-        <div id="spotlightTask" class="spotlight-empty">No critical task yet.</div>
-      </section>
-
-      <section class="card list-card">
-        <h2>Today</h2>
-        <div id="todayList" class="task-list"></div>
-      </section>
-
-      <section class="card list-card">
-        <h2>Milestones</h2>
-        <div id="milestonesList" class="task-list"></div>
-      </section>
-
-      <section class="card list-card">
-        <h2>Countdown</h2>
-        <div id="countdownMeta" class="countdown-meta"></div>
-        <div id="countdownList" class="task-list"></div>
+        <div id="taskList" class="task-list"></div>
+        <div class="controls-actions">
+          <button id="clearAllTasksBtn" class="btn">Clear All Tasks</button>
+        </div>
       </section>
     </main>
 

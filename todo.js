@@ -6,7 +6,6 @@ const SHARED_CONFIG = {
 };
 
 const defaultState = {
-  people: [],
   tasks: [],
 };
 
@@ -26,17 +25,13 @@ const els = {
   copyLinkBtn: document.getElementById("copyLinkBtn"),
   saveSnapshotBtn: document.getElementById("saveSnapshotBtn"),
   taskTitle: document.getElementById("taskTitle"),
-  taskSection: document.getElementById("taskSection"),
   taskPriority: document.getElementById("taskPriority"),
   taskAssignee: document.getElementById("taskAssignee"),
   taskDue: document.getElementById("taskDue"),
   addTaskBtn: document.getElementById("addTaskBtn"),
+  clearAllTasksBtn: document.getElementById("clearAllTasksBtn"),
   pills: document.querySelectorAll(".pill"),
-  spotlightTask: document.getElementById("spotlightTask"),
-  todayList: document.getElementById("todayList"),
-  milestonesList: document.getElementById("milestonesList"),
-  countdownList: document.getElementById("countdownList"),
-  countdownMeta: document.getElementById("countdownMeta"),
+  taskList: document.getElementById("taskList"),
 };
 
 init();
@@ -45,6 +40,7 @@ function init() {
   els.copyLinkBtn.addEventListener("click", copyShareLink);
   els.saveSnapshotBtn.addEventListener("click", saveSnapshot);
   els.addTaskBtn.addEventListener("click", addTask);
+  els.clearAllTasksBtn.addEventListener("click", clearAllTasks);
 
   for (const pill of els.pills) {
     pill.addEventListener("click", () => {
@@ -159,11 +155,7 @@ async function syncNow() {
     { code: collab.roomCode, payload: structuredClone(state), updated_at: new Date().toISOString() },
     { onConflict: "code" },
   );
-  if (error) setStatus(`Sync issue: ${error.message}`);
-}
-
-function setStatus(text) {
-  console.info(text);
+  if (error) console.info(`Sync issue: ${error.message}`);
 }
 
 async function copyShareLink() {
@@ -174,7 +166,7 @@ async function copyShareLink() {
     await navigator.clipboard.writeText(url.toString());
     pulse(els.copyLinkBtn, "Copied");
   } catch {
-    setStatus(`Copy this link: ${url}`);
+    console.info(`Copy this link: ${url}`);
   }
 }
 
@@ -190,7 +182,7 @@ async function saveSnapshot() {
     snapshot: structuredClone(state),
   });
   if (error) {
-    setStatus(`Snapshot issue: ${error.message}`);
+    console.info(`Snapshot issue: ${error.message}`);
     return;
   }
   pulse(els.saveSnapshotBtn, "Snapshot Saved");
@@ -203,7 +195,6 @@ function addTask() {
   const task = {
     id: crypto.randomUUID(),
     title,
-    section: els.taskSection.value,
     priority: els.taskPriority.value,
     assignee: els.taskAssignee.value.trim(),
     due: els.taskDue.value || "",
@@ -212,7 +203,6 @@ function addTask() {
   };
 
   state.tasks.unshift(task);
-  updatePeopleFromTask(task);
   persistState();
   queueSync();
   renderAll();
@@ -222,61 +212,37 @@ function addTask() {
   els.taskDue.value = "";
 }
 
-function updatePeopleFromTask(task) {
-  if (!task.assignee) return;
-  if (!state.people.includes(task.assignee)) {
-    state.people.push(task.assignee);
-  }
+function clearAllTasks() {
+  if (!state.tasks.length) return;
+  if (!confirm("Clear all tasks in this room? This cannot be undone.")) return;
+  state.tasks = [];
+  persistState();
+  queueSync();
+  renderAll();
+  pulse(els.clearAllTasksBtn, "Cleared");
 }
 
 function renderAll() {
-  renderSpotlight();
-  renderSection("today", els.todayList);
-  renderSection("milestones", els.milestonesList);
-  renderSection("countdown", els.countdownList);
-  renderCountdown();
+  renderTaskList();
 }
 
 function getVisibleTasks() {
   const tasks = state.tasks;
   if (currentView === "all") return tasks;
   if (currentView === "unassigned") return tasks.filter((t) => !t.assignee);
-  if (currentView === "openP1") {
-    return tasks.filter((t) => t.priority === "P1" && !t.done);
-  }
+  if (currentView === "openP1") return tasks.filter((t) => t.priority === "P1" && !t.done);
   return tasks;
 }
 
-function renderSpotlight() {
-  const task = state.tasks
-    .filter((t) => !t.done)
-    .sort((a, b) => {
-      const p = { P1: 1, P2: 2, P3: 3 };
-      return p[a.priority] - p[b.priority];
-    })[0];
-
-  if (!task) {
-    els.spotlightTask.className = "spotlight-empty";
-    els.spotlightTask.textContent = "No critical task yet.";
-    return;
-  }
-
-  els.spotlightTask.className = "spotlight-task";
-  els.spotlightTask.innerHTML = `
-    <p class="task-title">${escapeHtml(task.title)}</p>
-    <p class="task-meta">${task.priority} · ${escapeHtml(task.assignee || "Unassigned")}</p>
-  `;
-}
-
-function renderSection(section, targetEl) {
-  targetEl.innerHTML = "";
-  const tasks = getVisibleTasks().filter((t) => t.section === section);
+function renderTaskList() {
+  els.taskList.innerHTML = "";
+  const tasks = getVisibleTasks();
 
   if (!tasks.length) {
     const empty = document.createElement("p");
     empty.className = "task-meta";
-    empty.textContent = "No tasks in this section yet.";
-    targetEl.append(empty);
+    empty.textContent = "No tasks yet.";
+    els.taskList.append(empty);
     return;
   }
 
@@ -320,29 +286,8 @@ function renderSection(section, targetEl) {
 
     actions.append(doneBtn, delBtn);
     item.append(actions);
-    targetEl.append(item);
+    els.taskList.append(item);
   }
-}
-
-function renderCountdown() {
-  const dueDates = state.tasks
-    .filter((t) => t.section === "countdown" && t.due && !t.done)
-    .map((t) => new Date(`${t.due}T12:00:00`))
-    .filter((d) => !Number.isNaN(d.getTime()))
-    .sort((a, b) => a - b);
-
-  if (!dueDates.length) {
-    els.countdownMeta.textContent = "Add due dates to countdown tasks to see urgency.";
-    return;
-  }
-
-  const now = new Date();
-  const diff = Math.ceil((dueDates[0] - now) / (1000 * 60 * 60 * 24));
-
-  if (diff > 1) els.countdownMeta.textContent = `${diff} days until next countdown deadline.`;
-  else if (diff === 1) els.countdownMeta.textContent = "1 day until next countdown deadline.";
-  else if (diff === 0) els.countdownMeta.textContent = "Next countdown deadline is today.";
-  else els.countdownMeta.textContent = `${Math.abs(diff)} days past next countdown deadline.`;
 }
 
 function loadState() {
@@ -358,11 +303,9 @@ function loadState() {
 function normalizeState(raw) {
   const tasks = Array.isArray(raw.tasks) ? raw.tasks : [];
   return {
-    people: Array.isArray(raw.people) ? raw.people.map(String) : [],
     tasks: tasks.map((t) => ({
       id: String(t.id || crypto.randomUUID()),
       title: String(t.title || ""),
-      section: ["today", "milestones", "countdown"].includes(t.section) ? t.section : "today",
       priority: ["P1", "P2", "P3"].includes(t.priority) ? t.priority : "P2",
       assignee: String(t.assignee || ""),
       due: String(t.due || ""),
