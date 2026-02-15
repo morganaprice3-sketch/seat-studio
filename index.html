@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Seat Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Event Planning Tool</p>
+          <h1>The Seat Studio</h1>
+        </div>
+        <div class="header-actions">
+          <button id="saveBtn" class="btn">Save Snapshot</button>
+          <button id="resetBtn" class="btn danger">Reset Planner</button>
+        </div>
+      </header>
+      <nav class="panel jump-nav" aria-label="Quick jump">
+        <button class="btn jump-btn" data-jump-target="tableSetupSection">Jump to Table Setup</button>
+        <button class="btn jump-btn" data-jump-target="roomLayoutSection">Jump to Room Layout</button>
+        <button class="btn jump-btn" data-jump-target="overflowLayoutSection">Jump to Overflow Layout</button>
+        <button class="btn jump-btn" data-jump-target="savedSeatingSection">Jump to Saved Seating Arrangements</button>
+      </nav>
+
+      <section class="panel setup-panel" id="tableSetupSection">
+        <h2>Table Setup</h2>
+        <div class="setup-grid">
+          <label>
+            Main Room Tables
+            <input id="mainTableCount" type="number" min="0" max="100" value="12" />
+          </label>
+          <label>
+            Overflow Room Tables
+            <input id="overflowTableCount" type="number" min="0" max="100" value="6" />
+          </label>
+        </div>
+        <div class="actions-row">
+          <button id="generateBtn" class="btn primary">Update Table Count</button>
+          <button id="exportCurrentBtn" class="btn">Export Current Plan</button>
+        </div>
+        <div id="tableConfigList" class="table-config-list"></div>
+      </section>
+
+      <section class="panel layout-panel" id="roomLayoutSection">
+        <div class="layout-header">
+          <h2>Room Layout</h2>
+          <p>Drag tables to place them. Double-click any table to quickly edit its name and guest count.</p>
+        </div>
+        <div id="layoutTableEditor" class="layout-table-editor"></div>
+        <div id="roomCanvas" class="room-canvas" aria-label="Room layout"></div>
+      </section>
+
+      <section class="panel layout-panel" id="overflowLayoutSection">
+        <div class="layout-header">
+          <h2>Overflow Room Layout</h2>
+          <p>Drag tables to place them. Double-click any table to quickly edit its name and guest count.</p>
+        </div>
+        <div id="overflowTableEditor" class="layout-table-editor"></div>
+        <div id="overflowRoomCanvas" class="room-canvas" aria-label="Overflow room layout"></div>
+      </section>
+
+      <section class="panel crumbs-panel" id="savedSeatingSection">
+        <div class="crumbs-header">
+          <h3>Saved Seating Arrangements</h3>
+          <button id="clearSavesBtn" class="btn">Clear Saved Arrangements</button>
+        </div>
+        <div id="breadcrumbList" class="breadcrumb-list"></div>
+      </section>
+    </main>
+
+    <dialog id="seatDialog">
+      <form method="dialog" id="seatForm">
+        <h3 id="seatDialogTitle">Assign Seat</h3>
+        <label>
+          Guest
+          <select id="seatGuestSelect"></select>
+        </label>
+        <div class="quick-add">
+          <input id="quickGuestName" type="text" placeholder="New guest name" />
+          <input id="quickGuestGroup" type="text" placeholder="Group (optional)" />
+          <button id="quickAddGuestBtn" class="btn" type="button">Add to Roster</button>
+        </div>
+        <menu>
+          <button value="cancel" class="btn">Cancel</button>
+          <button id="removeSeatBtn" value="remove" class="btn danger" type="submit">Clear Seat</button>
+          <button value="default" class="btn primary" type="submit">Save</button>
+        </menu>
+      </form>
+    </dialog>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
