@@ -11,6 +11,7 @@ const defaultState = {
 
 let state = loadState();
 let currentView = "all";
+let currentPerson = "";
 
 const collab = {
   client: null,
@@ -33,7 +34,12 @@ const els = {
   addTaskBtn: document.getElementById("addTaskBtn"),
   clearAllTasksBtn: document.getElementById("clearAllTasksBtn"),
   pills: document.querySelectorAll(".pill"),
-  taskList: document.getElementById("taskList"),
+  personFilterWrap: document.getElementById("personFilterWrap"),
+  personFilter: document.getElementById("personFilter"),
+  p1List: document.getElementById("p1List"),
+  p2List: document.getElementById("p2List"),
+  p3List: document.getElementById("p3List"),
+  dropzones: document.querySelectorAll(".priority-dropzone"),
 };
 
 init();
@@ -48,12 +54,36 @@ function init() {
       setTaskPriority(btn.dataset.priority || "P2");
     });
   }
+  els.personFilter.addEventListener("change", () => {
+    currentPerson = els.personFilter.value;
+    renderAll();
+  });
+  for (const zone of els.dropzones) {
+    zone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      zone.classList.add("drag-over");
+    });
+    zone.addEventListener("dragleave", () => {
+      zone.classList.remove("drag-over");
+    });
+    zone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      zone.classList.remove("drag-over");
+      const taskId = event.dataTransfer?.getData("text/plain");
+      const nextPriority = zone.dataset.priority;
+      if (!taskId || !nextPriority) return;
+      moveTaskPriority(taskId, nextPriority);
+    });
+  }
 
   for (const pill of els.pills) {
     pill.addEventListener("click", () => {
       currentView = pill.dataset.view;
       for (const p of els.pills) p.classList.remove("active");
       pill.classList.add("active");
+      if (currentView === "byPerson" && !currentPerson) {
+        currentPerson = getUniqueAssignees()[0] || "";
+      }
       renderAll();
     });
   }
@@ -242,32 +272,54 @@ function clearAllTasks() {
 }
 
 function renderAll() {
-  renderTaskList();
+  renderPersonFilter();
+  renderTaskLists();
 }
 
 function getVisibleTasks() {
   const tasks = state.tasks;
   if (currentView === "all") return tasks;
   if (currentView === "unassigned") return tasks.filter((t) => !t.assignee);
-  if (currentView === "openP1") return tasks.filter((t) => t.priority === "P1" && !t.done);
+  if (currentView === "byPerson") {
+    if (!currentPerson) return [];
+    return tasks.filter((t) => t.assignee.toLowerCase() === currentPerson.toLowerCase());
+  }
   return tasks;
 }
 
-function renderTaskList() {
-  els.taskList.innerHTML = "";
+function renderTaskLists() {
   const tasks = getVisibleTasks();
+  const byPriority = {
+    P1: tasks.filter((t) => t.priority === "P1"),
+    P2: tasks.filter((t) => t.priority === "P2"),
+    P3: tasks.filter((t) => t.priority === "P3"),
+  };
+  renderPriorityList(els.p1List, byPriority.P1, "No P1 tasks.");
+  renderPriorityList(els.p2List, byPriority.P2, "No P2 tasks.");
+  renderPriorityList(els.p3List, byPriority.P3, "No P3 tasks.");
+}
 
+function renderPriorityList(container, tasks, emptyText) {
+  container.innerHTML = "";
   if (!tasks.length) {
     const empty = document.createElement("p");
     empty.className = "task-meta";
-    empty.textContent = "No tasks yet.";
-    els.taskList.append(empty);
+    empty.textContent = emptyText;
+    container.append(empty);
     return;
   }
 
   for (const task of tasks) {
     const item = document.createElement("article");
     item.className = `task-item ${task.done ? "done" : ""}`;
+    item.draggable = true;
+    item.addEventListener("dragstart", (event) => {
+      event.dataTransfer?.setData("text/plain", task.id);
+      item.classList.add("dragging");
+    });
+    item.addEventListener("dragend", () => {
+      item.classList.remove("dragging");
+    });
 
     const due = task.due ? ` · Due ${task.due}` : "";
     const notesHtml = task.notes ? `<p class="task-notes">${escapeHtml(task.notes)}</p>` : "";
@@ -307,8 +359,53 @@ function renderTaskList() {
 
     actions.append(doneBtn, delBtn);
     item.append(actions);
-    els.taskList.append(item);
+    container.append(item);
   }
+}
+
+function renderPersonFilter() {
+  if (currentView !== "byPerson") {
+    els.personFilterWrap.classList.add("hidden");
+    return;
+  }
+
+  els.personFilterWrap.classList.remove("hidden");
+  const assignees = getUniqueAssignees();
+  if (!assignees.length) {
+    currentPerson = "";
+    els.personFilter.innerHTML = "";
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "No assigned people yet";
+    els.personFilter.append(option);
+    return;
+  }
+
+  if (!assignees.includes(currentPerson)) currentPerson = assignees[0];
+  els.personFilter.innerHTML = "";
+  for (const name of assignees) {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    els.personFilter.append(option);
+  }
+  els.personFilter.value = currentPerson;
+}
+
+function getUniqueAssignees() {
+  return [...new Set(state.tasks.map((t) => t.assignee.trim()).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b),
+  );
+}
+
+function moveTaskPriority(taskId, nextPriority) {
+  if (!["P1", "P2", "P3"].includes(nextPriority)) return;
+  const task = state.tasks.find((t) => t.id === taskId);
+  if (!task || task.priority === nextPriority) return;
+  task.priority = nextPriority;
+  persistState();
+  queueSync();
+  renderAll();
 }
 
 function loadState() {

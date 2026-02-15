@@ -27,11 +27,11 @@
       <section class="card add-card">
         <h2>Add Task</h2>
         <div class="task-form-grid">
-          <label>
+          <label class="task-field">
             Task
             <input id="taskTitle" type="text" placeholder="Finalize VIP arrivals script" />
           </label>
-          <label>
+          <label class="priority-field">
             Priority
             <div class="priority-buttons" role="group" aria-label="Task priority">
               <button type="button" class="priority-btn active" data-priority="P1">P1 Critical</button>
@@ -63,9 +63,28 @@
         <div class="view-actions">
           <button class="pill active" data-view="all">All</button>
           <button class="pill" data-view="unassigned">Unassigned</button>
-          <button class="pill" data-view="openP1">Open P1</button>
+          <button class="pill" data-view="byPerson">By Person</button>
         </div>
-        <div id="taskList" class="task-list"></div>
+        <div id="personFilterWrap" class="person-filter-wrap hidden">
+          <label>
+            Person
+            <select id="personFilter"></select>
+          </label>
+        </div>
+        <div class="priority-board">
+          <section class="priority-column">
+            <h3>P1</h3>
+            <div id="p1List" class="task-list priority-dropzone" data-priority="P1"></div>
+          </section>
+          <section class="priority-column">
+            <h3>P2</h3>
+            <div id="p2List" class="task-list priority-dropzone" data-priority="P2"></div>
+          </section>
+          <section class="priority-column">
+            <h3>P3</h3>
+            <div id="p3List" class="task-list priority-dropzone" data-priority="P3"></div>
+          </section>
+        </div>
         <div class="controls-actions">
           <button id="clearAllTasksBtn" class="btn">Clear All Tasks</button>
         </div>

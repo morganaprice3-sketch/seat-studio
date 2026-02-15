@@ -31,6 +31,13 @@ h2 {
   letter-spacing: 0.01em;
 }
 
+h3 {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
 .page {
   width: min(900px, 94vw);
   margin: 2.4rem auto 3.2rem;
@@ -127,6 +134,12 @@ textarea:focus {
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
+.task-field,
+.priority-field,
+.notes-field {
+  grid-column: 1 / -1;
+}
+
 .controls-actions {
   margin-top: 0.8rem;
   display: flex;
@@ -159,10 +172,6 @@ textarea:focus {
   background: var(--burnt);
   border-color: var(--burnt);
   color: #fff;
-}
-
-.notes-field {
-  grid-column: 1 / -1;
 }
 
 .btn,
@@ -199,6 +208,42 @@ textarea:focus {
   gap: 0.5rem;
 }
 
+.hidden {
+  display: none;
+}
+
+.person-filter-wrap {
+  margin: 0.7rem 0;
+  max-width: 320px;
+}
+
+.priority-board {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.priority-column {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fffdf9;
+  padding: 0.65rem;
+  display: grid;
+  gap: 0.5rem;
+  min-height: 240px;
+}
+
+.priority-dropzone {
+  min-height: 170px;
+  align-content: start;
+}
+
+.priority-dropzone.drag-over {
+  outline: 2px dashed #d3a588;
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
 .spotlight-card {
   background: linear-gradient(165deg, #fff7ec, #fff1e1);
 }
@@ -226,6 +271,10 @@ textarea:focus {
   background: #fffdf9;
   display: grid;
   gap: 0.42rem;
+}
+
+.task-item.dragging {
+  opacity: 0.55;
 }
 
 .task-main {
@@ -321,5 +370,9 @@ textarea:focus {
 
   .task-main {
     flex-direction: column;
+  }
+
+  .priority-board {
+    grid-template-columns: 1fr;
   }
 }
