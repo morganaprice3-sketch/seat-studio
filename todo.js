@@ -13,6 +13,14 @@ let state = loadState();
 let currentView = "all";
 let currentPerson = "";
 let editingTaskId = null;
+const touchDrag = {
+  taskId: null,
+  sourceEl: null,
+  overPriority: null,
+  startX: 0,
+  startY: 0,
+  moved: false,
+};
 
 const collab = {
   client: null,
@@ -334,6 +342,81 @@ function renderPriorityList(container, tasks, emptyText) {
     item.addEventListener("dragend", () => {
       item.classList.remove("dragging");
     });
+    item.addEventListener(
+      "touchstart",
+      (event) => {
+        if (event.target.closest(".task-btn")) return;
+        if (!event.touches?.length) return;
+        const touch = event.touches[0];
+        touchDrag.taskId = task.id;
+        touchDrag.sourceEl = item;
+        touchDrag.overPriority = null;
+        touchDrag.startX = touch.clientX;
+        touchDrag.startY = touch.clientY;
+        touchDrag.moved = false;
+      },
+      { passive: true },
+    );
+    item.addEventListener(
+      "touchmove",
+      (event) => {
+        if (!touchDrag.taskId || touchDrag.taskId !== task.id) return;
+        if (!event.touches?.length) return;
+        const touch = event.touches[0];
+        const dx = Math.abs(touch.clientX - touchDrag.startX);
+        const dy = Math.abs(touch.clientY - touchDrag.startY);
+        if (!touchDrag.moved && dx + dy > 8) {
+          touchDrag.moved = true;
+          item.classList.add("touch-dragging");
+        }
+        if (!touchDrag.moved) return;
+        event.preventDefault();
+
+        for (const zone of els.dropzones) zone.classList.remove("drag-over");
+        const hovered = document.elementFromPoint(touch.clientX, touch.clientY);
+        const dropzone = hovered?.closest?.(".priority-dropzone");
+        if (!dropzone) {
+          touchDrag.overPriority = null;
+          return;
+        }
+        dropzone.classList.add("drag-over");
+        touchDrag.overPriority = dropzone.dataset.priority || null;
+      },
+      { passive: false },
+    );
+    item.addEventListener(
+      "touchend",
+      () => {
+        if (!touchDrag.taskId || touchDrag.taskId !== task.id) return;
+        const nextPriority = touchDrag.overPriority;
+        const moved = touchDrag.moved;
+        item.classList.remove("touch-dragging");
+        for (const zone of els.dropzones) zone.classList.remove("drag-over");
+        touchDrag.taskId = null;
+        touchDrag.sourceEl = null;
+        touchDrag.overPriority = null;
+        touchDrag.startX = 0;
+        touchDrag.startY = 0;
+        touchDrag.moved = false;
+        if (moved && nextPriority) moveTaskPriority(task.id, nextPriority);
+      },
+      { passive: true },
+    );
+    item.addEventListener(
+      "touchcancel",
+      () => {
+        if (!touchDrag.taskId || touchDrag.taskId !== task.id) return;
+        item.classList.remove("touch-dragging");
+        for (const zone of els.dropzones) zone.classList.remove("drag-over");
+        touchDrag.taskId = null;
+        touchDrag.sourceEl = null;
+        touchDrag.overPriority = null;
+        touchDrag.startX = 0;
+        touchDrag.startY = 0;
+        touchDrag.moved = false;
+      },
+      { passive: true },
+    );
 
     const notesHtml = task.notes ? `<p class="task-notes">${escapeHtml(task.notes)}</p>` : "";
     item.innerHTML = `

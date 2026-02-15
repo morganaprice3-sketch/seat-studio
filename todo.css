@@ -308,6 +308,11 @@ textarea:focus {
   opacity: 0.55;
 }
 
+.task-item.touch-dragging {
+  opacity: 0.72;
+  box-shadow: 0 12px 22px rgba(28, 34, 48, 0.18);
+}
+
 .task-main {
   display: flex;
   justify-content: space-between;
