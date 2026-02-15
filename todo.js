@@ -8,6 +8,11 @@ const SHARED_CONFIG = {
 const defaultState = {
   tasks: [],
 };
+const PRIORITY_LABELS = {
+  P1: "Critical",
+  P2: "Important",
+  P3: "Nice to have",
+};
 
 let state = loadState();
 let currentView = "all";
@@ -426,7 +431,7 @@ function renderPriorityList(container, tasks, emptyText) {
           <p class="task-meta">${escapeHtml(task.assignee || "Unassigned")}</p>
           ${notesHtml}
         </div>
-        <span class="tag ${task.priority.toLowerCase()}">${task.priority}</span>
+        <span class="tag ${task.priority.toLowerCase()}">${getPriorityLabel(task.priority)}</span>
       </div>
     `;
 
@@ -438,11 +443,12 @@ function renderPriorityList(container, tasks, emptyText) {
     doneBtn.textContent = task.done ? "Mark Open" : "Mark Done";
     doneBtn.addEventListener("click", () => {
       const wasDone = task.done;
+      const doneRect = doneBtn.getBoundingClientRect();
       task.done = !task.done;
       persistState();
       queueSync();
       renderAll();
-      if (!wasDone && task.done) launchCelebration(doneBtn);
+      if (!wasDone && task.done) launchCelebration(doneRect);
     });
 
     const delBtn = document.createElement("button");
@@ -550,8 +556,7 @@ function moveTaskPriority(taskId, nextPriority) {
   renderAll();
 }
 
-function launchCelebration(anchorEl) {
-  const rect = anchorEl.getBoundingClientRect();
+function launchCelebration(rect) {
   const colors = ["#fb5315", "#1c2230", "#f6a07a", "#ffc7b2"];
   const pieceCount = 18;
 
@@ -571,6 +576,10 @@ function launchCelebration(anchorEl) {
     document.body.append(piece);
     piece.addEventListener("animationend", () => piece.remove());
   }
+}
+
+function getPriorityLabel(priority) {
+  return PRIORITY_LABELS[priority] || priority;
 }
 
 function loadState() {
