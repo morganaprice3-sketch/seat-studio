@@ -29,7 +29,6 @@ const els = {
   taskPriority: document.getElementById("taskPriority"),
   priorityBtns: document.querySelectorAll(".priority-btn"),
   taskAssignee: document.getElementById("taskAssignee"),
-  taskDue: document.getElementById("taskDue"),
   taskNotes: document.getElementById("taskNotes"),
   addTaskBtn: document.getElementById("addTaskBtn"),
   clearAllTasksBtn: document.getElementById("clearAllTasksBtn"),
@@ -243,7 +242,6 @@ function addTask() {
     title,
     priority: els.taskPriority.value,
     assignee: els.taskAssignee.value.trim(),
-    due: els.taskDue.value || "",
     notes: els.taskNotes.value.trim(),
     done: false,
     createdAt: new Date().toISOString(),
@@ -256,7 +254,6 @@ function addTask() {
 
   els.taskTitle.value = "";
   els.taskAssignee.value = "";
-  els.taskDue.value = "";
   els.taskNotes.value = "";
   setTaskPriority("P1");
 }
@@ -321,13 +318,12 @@ function renderPriorityList(container, tasks, emptyText) {
       item.classList.remove("dragging");
     });
 
-    const due = task.due ? ` · Due ${task.due}` : "";
     const notesHtml = task.notes ? `<p class="task-notes">${escapeHtml(task.notes)}</p>` : "";
     item.innerHTML = `
       <div class="task-main">
         <div>
           <p class="task-title">${escapeHtml(task.title)}</p>
-          <p class="task-meta">${escapeHtml(task.assignee || "Unassigned")}${due}</p>
+          <p class="task-meta">${escapeHtml(task.assignee || "Unassigned")}</p>
           ${notesHtml}
         </div>
         <span class="tag ${task.priority.toLowerCase()}">${task.priority}</span>
@@ -357,10 +353,40 @@ function renderPriorityList(container, tasks, emptyText) {
       renderAll();
     });
 
-    actions.append(doneBtn, delBtn);
+    const editBtn = document.createElement("button");
+    editBtn.className = "task-btn";
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", () => {
+      editTask(task.id);
+    });
+
+    actions.append(editBtn, doneBtn, delBtn);
     item.append(actions);
     container.append(item);
   }
+}
+
+function editTask(taskId) {
+  const task = state.tasks.find((t) => t.id === taskId);
+  if (!task) return;
+
+  const nextTitle = prompt("Task title", task.title);
+  if (nextTitle === null) return;
+  const title = nextTitle.trim();
+  if (!title) return;
+
+  const nextAssignee = prompt("Assign to (leave blank for unassigned)", task.assignee || "");
+  if (nextAssignee === null) return;
+
+  const nextNotes = prompt("Notes (optional)", task.notes || "");
+  if (nextNotes === null) return;
+
+  task.title = title;
+  task.assignee = nextAssignee.trim();
+  task.notes = nextNotes.trim();
+  persistState();
+  queueSync();
+  renderAll();
 }
 
 function renderPersonFilter() {
@@ -426,7 +452,6 @@ function normalizeState(raw) {
       title: String(t.title || ""),
       priority: ["P1", "P2", "P3"].includes(t.priority) ? t.priority : "P2",
       assignee: String(t.assignee || ""),
-      due: String(t.due || ""),
       notes: String(t.notes || ""),
       done: Boolean(t.done),
       createdAt: String(t.createdAt || new Date().toISOString()),
