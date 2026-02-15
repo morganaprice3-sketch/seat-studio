@@ -569,3 +569,54 @@ menu {
     grid-template-columns: 1fr;
   }
 }
+
+@media print {
+  @page {
+    margin: 12mm;
+    size: portrait;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  body.print-layouts-only .app-shell {
+    width: 100%;
+    margin: 0;
+    gap: 0.8rem;
+  }
+
+  body.print-layouts-only .app-shell > * {
+    display: none !important;
+  }
+
+  body.print-layouts-only #roomLayoutSection,
+  body.print-layouts-only #overflowLayoutSection {
+    display: block !important;
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #d6dce8;
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.85rem;
+  }
+
+  body.print-layouts-only #roomLayoutSection .layout-header p,
+  body.print-layouts-only #overflowLayoutSection .layout-header p,
+  body.print-layouts-only #roomLayoutSection .layout-table-editor,
+  body.print-layouts-only #overflowLayoutSection .layout-table-editor {
+    display: none !important;
+  }
+
+  body.print-layouts-only #roomLayoutSection h2,
+  body.print-layouts-only #overflowLayoutSection h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.45rem;
+  }
+
+  body.print-layouts-only .room-canvas {
+    margin-top: 0;
+    min-height: 520px;
+    background: #f9fbff;
+  }
+}
