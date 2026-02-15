@@ -1,13 +1,14 @@
 :root {
-  --cream: #f7f2e8;
-  --cream-deep: #efe7d8;
-  --paper: #fffaf1;
-  --ink: #2f2a24;
-  --ink-soft: #6f6458;
-  --burnt: #be5f2f;
-  --burnt-soft: #f0d7c9;
-  --line: #e4d8c6;
-  --shadow: 0 10px 22px rgba(84, 53, 31, 0.08);
+  --cream: #fffcf5;
+  --cream-deep: #fffcf5;
+  --paper: #fffef9;
+  --ink: #fb5315;
+  --ink-soft: rgba(251, 83, 21, 0.76);
+  --line: rgba(251, 83, 21, 0.22);
+  --line-strong: rgba(251, 83, 21, 0.4);
+  --surface-tint: rgba(251, 83, 21, 0.04);
+  --surface-tint-2: rgba(251, 83, 21, 0.08);
+  --shadow: 0 10px 26px rgba(251, 83, 21, 0.08);
 }
 
 * {
@@ -16,7 +17,7 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at 18% -18%, #fff9ef 0%, var(--cream) 56%, var(--cream-deep) 100%);
+  background: var(--cream);
   color: var(--ink);
   font-family: "Inter", system-ui, sans-serif;
   font-size: 16px;
@@ -55,10 +56,11 @@ h3 {
 
 .eyebrow {
   margin: 0;
-  color: var(--burnt);
+  color: var(--ink);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.73rem;
+  opacity: 0.88;
 }
 
 .sub {
@@ -97,7 +99,7 @@ select {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fffcf6;
+  background: var(--surface-tint);
   color: var(--ink);
   padding: 0.58rem 0.62rem;
 }
@@ -105,15 +107,15 @@ select {
 input:focus,
 select:focus {
   outline: none;
-  border-color: #d3a588;
-  box-shadow: 0 0 0 3px rgba(190, 95, 47, 0.14);
+  border-color: var(--line-strong);
+  box-shadow: 0 0 0 3px rgba(251, 83, 21, 0.16);
 }
 
 textarea {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fffcf6;
+  background: var(--surface-tint);
   color: var(--ink);
   padding: 0.58rem 0.62rem;
   font: inherit;
@@ -123,8 +125,8 @@ textarea {
 
 textarea:focus {
   outline: none;
-  border-color: #d3a588;
-  box-shadow: 0 0 0 3px rgba(190, 95, 47, 0.14);
+  border-color: var(--line-strong);
+  box-shadow: 0 0 0 3px rgba(251, 83, 21, 0.16);
 }
 
 .controls-grid,
@@ -154,10 +156,10 @@ textarea:focus {
 }
 
 .priority-btn {
-  border: 1px solid #d6c5b2;
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.44rem 0.74rem;
-  background: #faf2e8;
+  background: var(--surface-tint);
   color: var(--ink);
   cursor: pointer;
   font: inherit;
@@ -165,21 +167,21 @@ textarea:focus {
 }
 
 .priority-btn:hover {
-  background: #f6ebdf;
+  background: var(--surface-tint-2);
 }
 
 .priority-btn.active {
-  background: var(--burnt);
-  border-color: var(--burnt);
-  color: #fff;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fffcf5;
 }
 
 .btn,
 .pill {
-  border: 1px solid #d6c5b2;
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.5rem 0.82rem;
-  background: #faf2e8;
+  background: var(--surface-tint);
   color: var(--ink);
   cursor: pointer;
   transition: background-color 140ms ease, border-color 140ms ease;
@@ -187,14 +189,14 @@ textarea:focus {
 
 .btn:hover,
 .pill:hover {
-  background: #f6ebdf;
+  background: var(--surface-tint-2);
 }
 
 .btn.primary,
 .pill.active {
-  background: var(--burnt);
-  border-color: var(--burnt);
-  color: #fff;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fffcf5;
 }
 
 .status {
@@ -226,7 +228,7 @@ textarea:focus {
 .priority-column {
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #fffdf9;
+  background: rgba(251, 83, 21, 0.025);
   padding: 0.65rem;
   display: grid;
   gap: 0.5rem;
@@ -239,7 +241,7 @@ textarea:focus {
 }
 
 .priority-dropzone.drag-over {
-  outline: 2px dashed #d3a588;
+  outline: 2px dashed var(--line-strong);
   outline-offset: 3px;
   border-radius: 10px;
 }
@@ -268,7 +270,7 @@ textarea:focus {
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 0.72rem;
-  background: #fffdf9;
+  background: #fffefb;
   display: grid;
   gap: 0.42rem;
 }
@@ -297,7 +299,7 @@ textarea:focus {
 
 .task-notes {
   margin: 0;
-  color: #5e564e;
+  color: var(--ink-soft);
   font-size: 0.88rem;
   line-height: 1.5;
   white-space: pre-wrap;
@@ -313,21 +315,21 @@ textarea:focus {
 }
 
 .tag.p1 {
-  background: #fbe2d4;
-  border-color: #efc4ac;
-  color: #9e4317;
+  background: rgba(251, 83, 21, 0.16);
+  border-color: rgba(251, 83, 21, 0.35);
+  color: var(--ink);
 }
 
 .tag.p2 {
-  background: #f4e8d9;
-  border-color: #e5cfb3;
-  color: #89613f;
+  background: rgba(251, 83, 21, 0.11);
+  border-color: rgba(251, 83, 21, 0.3);
+  color: var(--ink);
 }
 
 .tag.p3 {
-  background: #f2efe8;
-  border-color: #dbd4c8;
-  color: #6f665d;
+  background: rgba(251, 83, 21, 0.07);
+  border-color: rgba(251, 83, 21, 0.24);
+  color: var(--ink-soft);
 }
 
 .task-actions {
@@ -337,9 +339,9 @@ textarea:focus {
 }
 
 .task-btn {
-  border: 1px solid #dbcbb8;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: #fcf6ee;
+  background: var(--surface-tint);
   color: var(--ink-soft);
   padding: 0.28rem 0.58rem;
   font-size: 0.78rem;
@@ -347,7 +349,7 @@ textarea:focus {
 }
 
 .task-btn:hover {
-  background: #f7edde;
+  background: var(--surface-tint-2);
 }
 
 .task-item.done {
