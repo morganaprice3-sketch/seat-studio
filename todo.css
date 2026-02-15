@@ -2,13 +2,15 @@
   --cream: #fffcf5;
   --cream-deep: #fffcf5;
   --paper: #fffef9;
-  --ink: #fb5315;
-  --ink-soft: rgba(251, 83, 21, 0.76);
-  --line: rgba(251, 83, 21, 0.22);
-  --line-strong: rgba(251, 83, 21, 0.4);
-  --surface-tint: rgba(251, 83, 21, 0.04);
-  --surface-tint-2: rgba(251, 83, 21, 0.08);
-  --shadow: 0 10px 26px rgba(251, 83, 21, 0.08);
+  --color-ink: #1c2230;
+  --ink: var(--color-ink);
+  --ink-soft: rgba(28, 34, 48, 0.72);
+  --accent: #fb5315;
+  --line: rgba(28, 34, 48, 0.18);
+  --line-strong: rgba(28, 34, 48, 0.34);
+  --surface-tint: rgba(28, 34, 48, 0.03);
+  --surface-tint-2: rgba(28, 34, 48, 0.06);
+  --shadow: 0 10px 26px rgba(28, 34, 48, 0.08);
 }
 
 * {
@@ -56,11 +58,11 @@ h3 {
 
 .eyebrow {
   margin: 0;
-  color: var(--ink);
+  color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.73rem;
-  opacity: 0.88;
+  opacity: 0.95;
 }
 
 .sub {
@@ -107,7 +109,7 @@ select {
 input:focus,
 select:focus {
   outline: none;
-  border-color: var(--line-strong);
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(251, 83, 21, 0.16);
 }
 
@@ -125,7 +127,7 @@ textarea {
 
 textarea:focus {
   outline: none;
-  border-color: var(--line-strong);
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(251, 83, 21, 0.16);
 }
 
@@ -171,8 +173,8 @@ textarea:focus {
 }
 
 .priority-btn.active {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fffcf5;
 }
 
@@ -194,8 +196,8 @@ textarea:focus {
 
 .btn.primary,
 .pill.active {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fffcf5;
 }
 
@@ -228,7 +230,7 @@ textarea:focus {
 .priority-column {
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(251, 83, 21, 0.025);
+  background: rgba(28, 34, 48, 0.02);
   padding: 0.65rem;
   display: grid;
   gap: 0.5rem;
@@ -241,7 +243,7 @@ textarea:focus {
 }
 
 .priority-dropzone.drag-over {
-  outline: 2px dashed var(--line-strong);
+  outline: 2px dashed var(--accent);
   outline-offset: 3px;
   border-radius: 10px;
 }
@@ -315,20 +317,20 @@ textarea:focus {
 }
 
 .tag.p1 {
-  background: rgba(251, 83, 21, 0.16);
-  border-color: rgba(251, 83, 21, 0.35);
+  background: rgba(28, 34, 48, 0.1);
+  border-color: rgba(28, 34, 48, 0.24);
   color: var(--ink);
 }
 
 .tag.p2 {
-  background: rgba(251, 83, 21, 0.11);
-  border-color: rgba(251, 83, 21, 0.3);
+  background: rgba(28, 34, 48, 0.08);
+  border-color: rgba(28, 34, 48, 0.2);
   color: var(--ink);
 }
 
 .tag.p3 {
-  background: rgba(251, 83, 21, 0.07);
-  border-color: rgba(251, 83, 21, 0.24);
+  background: rgba(28, 34, 48, 0.05);
+  border-color: rgba(28, 34, 48, 0.16);
   color: var(--ink-soft);
 }
 
