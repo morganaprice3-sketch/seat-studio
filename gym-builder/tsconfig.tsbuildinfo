@@ -1,1 +1,0 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/components/summarypanel.tsx","./src/data/workoutdata.ts","./src/pages/builderpage.tsx","./src/pages/runpage.tsx","./src/pages/summarypage.tsx","./src/pages/workouttypepage.tsx","./src/store/workoutstore.ts","./src/types/workout.ts"],"version":"5.9.3"}
