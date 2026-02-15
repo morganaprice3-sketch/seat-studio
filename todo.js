@@ -12,6 +12,7 @@ const defaultState = {
 let state = loadState();
 let currentView = "all";
 let currentPerson = "";
+let editingTaskId = null;
 
 const collab = {
   client: null,
@@ -39,6 +40,12 @@ const els = {
   p2List: document.getElementById("p2List"),
   p3List: document.getElementById("p3List"),
   dropzones: document.querySelectorAll(".priority-dropzone"),
+  editModal: document.getElementById("editModal"),
+  editTaskTitleInput: document.getElementById("editTaskTitleInput"),
+  editTaskAssigneeInput: document.getElementById("editTaskAssigneeInput"),
+  editTaskNotesInput: document.getElementById("editTaskNotesInput"),
+  saveEditTaskBtn: document.getElementById("saveEditTaskBtn"),
+  cancelEditTaskBtn: document.getElementById("cancelEditTaskBtn"),
 };
 
 init();
@@ -48,6 +55,16 @@ function init() {
   els.saveSnapshotBtn.addEventListener("click", saveSnapshot);
   els.addTaskBtn.addEventListener("click", addTask);
   els.clearAllTasksBtn.addEventListener("click", clearAllTasks);
+  els.saveEditTaskBtn.addEventListener("click", saveTaskEdits);
+  els.cancelEditTaskBtn.addEventListener("click", closeEditModal);
+  els.editModal.addEventListener("click", (event) => {
+    if (event.target === els.editModal) closeEditModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !els.editModal.classList.contains("hidden")) {
+      closeEditModal();
+    }
+  });
   for (const btn of els.priorityBtns) {
     btn.addEventListener("click", () => {
       setTaskPriority(btn.dataset.priority || "P2");
@@ -337,10 +354,12 @@ function renderPriorityList(container, tasks, emptyText) {
     doneBtn.className = "task-btn";
     doneBtn.textContent = task.done ? "Mark Open" : "Mark Done";
     doneBtn.addEventListener("click", () => {
+      const wasDone = task.done;
       task.done = !task.done;
       persistState();
       queueSync();
       renderAll();
+      if (!wasDone && task.done) launchCelebration(doneBtn);
     });
 
     const delBtn = document.createElement("button");
@@ -369,24 +388,38 @@ function renderPriorityList(container, tasks, emptyText) {
 function editTask(taskId) {
   const task = state.tasks.find((t) => t.id === taskId);
   if (!task) return;
+  editingTaskId = task.id;
+  els.editTaskTitleInput.value = task.title;
+  els.editTaskAssigneeInput.value = task.assignee || "";
+  els.editTaskNotesInput.value = task.notes || "";
+  els.editModal.classList.remove("hidden");
+  els.editTaskTitleInput.focus();
+  els.editTaskTitleInput.select();
+}
 
-  const nextTitle = prompt("Task title", task.title);
-  if (nextTitle === null) return;
-  const title = nextTitle.trim();
+function saveTaskEdits() {
+  if (!editingTaskId) return;
+  const task = state.tasks.find((t) => t.id === editingTaskId);
+  if (!task) {
+    closeEditModal();
+    return;
+  }
+
+  const title = els.editTaskTitleInput.value.trim();
   if (!title) return;
 
-  const nextAssignee = prompt("Assign to (leave blank for unassigned)", task.assignee || "");
-  if (nextAssignee === null) return;
-
-  const nextNotes = prompt("Notes (optional)", task.notes || "");
-  if (nextNotes === null) return;
-
   task.title = title;
-  task.assignee = nextAssignee.trim();
-  task.notes = nextNotes.trim();
+  task.assignee = els.editTaskAssigneeInput.value.trim();
+  task.notes = els.editTaskNotesInput.value.trim();
   persistState();
   queueSync();
   renderAll();
+  closeEditModal();
+}
+
+function closeEditModal() {
+  editingTaskId = null;
+  els.editModal.classList.add("hidden");
 }
 
 function renderPersonFilter() {
@@ -432,6 +465,26 @@ function moveTaskPriority(taskId, nextPriority) {
   persistState();
   queueSync();
   renderAll();
+}
+
+function launchCelebration(anchorEl) {
+  const rect = anchorEl.getBoundingClientRect();
+  const originX = rect.left + rect.width / 2;
+  const originY = rect.top + rect.height / 2;
+  const colors = ["#fb5315", "#1c2230", "#f6a07a", "#ffc7b2"];
+
+  for (let i = 0; i < 14; i += 1) {
+    const piece = document.createElement("span");
+    piece.className = "celebration-piece";
+    piece.style.left = `${originX}px`;
+    piece.style.top = `${originY}px`;
+    piece.style.background = colors[i % colors.length];
+    piece.style.setProperty("--dx", `${Math.round((Math.random() - 0.5) * 160)}px`);
+    piece.style.setProperty("--dy", `${Math.round(60 + Math.random() * 120)}px`);
+    piece.style.animationDuration = `${700 + Math.round(Math.random() * 350)}ms`;
+    document.body.append(piece);
+    piece.addEventListener("animationend", () => piece.remove());
+  }
 }
 
 function loadState() {

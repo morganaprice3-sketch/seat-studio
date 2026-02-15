@@ -216,6 +216,29 @@ textarea:focus {
   display: none;
 }
 
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 34, 48, 0.28);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  z-index: 30;
+}
+
+.modal-card {
+  width: min(680px, 96vw);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.modal-card h2 {
+  margin-bottom: 0.65rem;
+}
+
 .person-filter-wrap {
   margin: 0.7rem 0;
   max-width: 320px;
@@ -356,6 +379,28 @@ textarea:focus {
 
 .task-item.done {
   opacity: 0.66;
+}
+
+.celebration-piece {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 45;
+  animation: celebrate-fall 800ms ease-out forwards;
+}
+
+@keyframes celebrate-fall {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate3d(var(--dx, 0px), var(--dy, 90px), 0) scale(0.35);
+    opacity: 0;
+  }
 }
 
 .countdown-meta {

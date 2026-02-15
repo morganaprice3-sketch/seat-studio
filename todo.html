@@ -87,6 +87,30 @@
       </section>
     </main>
 
+    <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editTaskTitle">
+      <div class="modal-card">
+        <h2 id="editTaskTitle">Edit Task</h2>
+        <div class="task-form-grid">
+          <label class="task-field">
+            Task
+            <input id="editTaskTitleInput" type="text" />
+          </label>
+          <label>
+            Assign To
+            <input id="editTaskAssigneeInput" type="text" />
+          </label>
+          <label class="notes-field">
+            Notes
+            <textarea id="editTaskNotesInput" rows="4"></textarea>
+          </label>
+        </div>
+        <div class="controls-actions">
+          <button id="saveEditTaskBtn" class="btn primary">Save Changes</button>
+          <button id="cancelEditTaskBtn" class="btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="todo.js"></script>
   </body>
