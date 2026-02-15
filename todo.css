@@ -226,6 +226,10 @@ textarea:focus {
   z-index: 30;
 }
 
+.modal.hidden {
+  display: none;
+}
+
 .modal-card {
   width: min(680px, 96vw);
   background: var(--paper);
