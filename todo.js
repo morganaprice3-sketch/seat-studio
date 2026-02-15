@@ -552,19 +552,22 @@ function moveTaskPriority(taskId, nextPriority) {
 
 function launchCelebration(anchorEl) {
   const rect = anchorEl.getBoundingClientRect();
-  const originX = rect.left + rect.width / 2;
-  const originY = rect.top + rect.height / 2;
   const colors = ["#fb5315", "#1c2230", "#f6a07a", "#ffc7b2"];
+  const pieceCount = 18;
 
-  for (let i = 0; i < 14; i += 1) {
+  for (let i = 0; i < pieceCount; i += 1) {
+    const angle = (Math.PI * 2 * i) / pieceCount + (Math.random() - 0.5) * 0.35;
+    const distance = 34 + Math.random() * 48;
+    const startX = rect.left + Math.random() * rect.width;
+    const startY = rect.top + Math.random() * rect.height;
     const piece = document.createElement("span");
     piece.className = "celebration-piece";
-    piece.style.left = `${originX}px`;
-    piece.style.top = `${originY}px`;
+    piece.style.left = `${startX}px`;
+    piece.style.top = `${startY}px`;
     piece.style.background = colors[i % colors.length];
-    piece.style.setProperty("--dx", `${Math.round((Math.random() - 0.5) * 160)}px`);
-    piece.style.setProperty("--dy", `${Math.round(60 + Math.random() * 120)}px`);
-    piece.style.animationDuration = `${700 + Math.round(Math.random() * 350)}ms`;
+    piece.style.setProperty("--dx", `${Math.round(Math.cos(angle) * distance)}px`);
+    piece.style.setProperty("--dy", `${Math.round(Math.sin(angle) * distance)}px`);
+    piece.style.animationDuration = `${520 + Math.round(Math.random() * 260)}ms`;
     document.body.append(piece);
     piece.addEventListener("animationend", () => piece.remove());
   }
