@@ -15,7 +15,6 @@ let state = loadState();
 let currentView = "all";
 let myIdentity = {
   name: "",
-  role: "",
 };
 
 const collab = {
@@ -30,7 +29,6 @@ const collab = {
 const els = {
   roomCode: document.getElementById("roomCode"),
   myName: document.getElementById("myName"),
-  myRole: document.getElementById("myRole"),
   eventDate: document.getElementById("eventDate"),
   connectBtn: document.getElementById("connectBtn"),
   copyLinkBtn: document.getElementById("copyLinkBtn"),
@@ -40,7 +38,6 @@ const els = {
   taskSection: document.getElementById("taskSection"),
   taskPriority: document.getElementById("taskPriority"),
   taskAssignee: document.getElementById("taskAssignee"),
-  taskRole: document.getElementById("taskRole"),
   taskDue: document.getElementById("taskDue"),
   addTaskBtn: document.getElementById("addTaskBtn"),
   pills: document.querySelectorAll(".pill"),
@@ -56,11 +53,9 @@ init();
 function init() {
   const roomFromUrl = getRoomFromUrl();
   myIdentity.name = localStorage.getItem("event-focus-my-name") || "";
-  myIdentity.role = localStorage.getItem("event-focus-my-role") || "";
 
   els.roomCode.value = roomFromUrl;
   els.myName.value = myIdentity.name;
-  els.myRole.value = myIdentity.role;
   els.eventDate.value = state.eventDate || "";
 
   els.connectBtn.addEventListener("click", connectRoom);
@@ -71,12 +66,6 @@ function init() {
   els.myName.addEventListener("input", () => {
     myIdentity.name = els.myName.value.trim();
     localStorage.setItem("event-focus-my-name", myIdentity.name);
-    renderAll();
-  });
-
-  els.myRole.addEventListener("change", () => {
-    myIdentity.role = els.myRole.value;
-    localStorage.setItem("event-focus-my-role", myIdentity.role);
     renderAll();
   });
 
@@ -253,7 +242,6 @@ function addTask() {
     section: els.taskSection.value,
     priority: els.taskPriority.value,
     assignee: els.taskAssignee.value.trim(),
-    role: els.taskRole.value,
     due: els.taskDue.value || "",
     done: false,
     createdAt: new Date().toISOString(),
@@ -292,10 +280,7 @@ function getVisibleTasks() {
     if (!myIdentity.name) return [];
     return tasks.filter((t) => t.assignee.toLowerCase() === myIdentity.name.toLowerCase());
   }
-  if (currentView === "myRole") {
-    if (!myIdentity.role) return [];
-    return tasks.filter((t) => t.role === myIdentity.role);
-  }
+  if (currentView === "unassigned") return tasks.filter((t) => !t.assignee);
   if (currentView === "openP1") {
     return tasks.filter((t) => t.priority === "P1" && !t.done);
   }
@@ -319,7 +304,7 @@ function renderSpotlight() {
   els.spotlightTask.className = "spotlight-task";
   els.spotlightTask.innerHTML = `
     <p class="task-title">${escapeHtml(task.title)}</p>
-    <p class="task-meta">${task.priority} · ${escapeHtml(task.assignee || "Unassigned")}${task.role ? ` · ${escapeHtml(task.role)}` : ""}</p>
+    <p class="task-meta">${task.priority} · ${escapeHtml(task.assignee || "Unassigned")}</p>
   `;
 }
 
@@ -344,7 +329,7 @@ function renderSection(section, targetEl) {
       <div class="task-main">
         <div>
           <p class="task-title">${escapeHtml(task.title)}</p>
-          <p class="task-meta">${escapeHtml(task.assignee || "Unassigned")}${task.role ? ` · ${escapeHtml(task.role)}` : ""}${due}</p>
+          <p class="task-meta">${escapeHtml(task.assignee || "Unassigned")}${due}</p>
         </div>
         <span class="tag ${task.priority.toLowerCase()}">${task.priority}</span>
       </div>
@@ -421,7 +406,6 @@ function normalizeState(raw) {
       section: ["today", "milestones", "countdown"].includes(t.section) ? t.section : "today",
       priority: ["P1", "P2", "P3"].includes(t.priority) ? t.priority : "P2",
       assignee: String(t.assignee || ""),
-      role: String(t.role || ""),
       due: String(t.due || ""),
       done: Boolean(t.done),
       createdAt: String(t.createdAt || new Date().toISOString()),

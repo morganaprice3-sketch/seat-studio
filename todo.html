@@ -20,7 +20,8 @@
         <p class="sub">A calm place to keep momentum, assign work, and stay aligned.</p>
       </header>
 
-      <section class="card controls-card">
+      <section class="card add-card">
+        <h2>Add Task</h2>
         <div class="controls-grid">
           <label>
             Room Code
@@ -31,35 +32,17 @@
             <input id="myName" type="text" placeholder="Morgan" />
           </label>
           <label>
-            Your Role
-            <select id="myRole">
-              <option value="">Select role</option>
-              <option>Producer</option>
-              <option>Operations</option>
-              <option>Hospitality</option>
-              <option>Logistics</option>
-              <option>Creative</option>
-              <option>Finance</option>
-              <option>Executive</option>
-            </select>
-          </label>
-          <label>
             Event Date
             <input id="eventDate" type="date" />
           </label>
         </div>
-
         <div class="controls-actions">
           <button id="connectBtn" class="btn primary">Connect Room</button>
           <button id="copyLinkBtn" class="btn">Copy Share Link</button>
           <button id="saveSnapshotBtn" class="btn">Save Snapshot</button>
         </div>
-
         <p id="statusText" class="status">Disconnected</p>
-      </section>
 
-      <section class="card add-card">
-        <h2>Add Task</h2>
         <div class="task-form-grid">
           <label>
             Task
@@ -86,19 +69,6 @@
             <input id="taskAssignee" type="text" placeholder="Ari" />
           </label>
           <label>
-            Role
-            <select id="taskRole">
-              <option value="">No role</option>
-              <option>Producer</option>
-              <option>Operations</option>
-              <option>Hospitality</option>
-              <option>Logistics</option>
-              <option>Creative</option>
-              <option>Finance</option>
-              <option>Executive</option>
-            </select>
-          </label>
-          <label>
             Due
             <input id="taskDue" type="date" />
           </label>
@@ -109,11 +79,11 @@
       </section>
 
       <section class="card filters-card">
-        <h2>Role-Aware View</h2>
+        <h2>Focused View</h2>
         <div class="view-actions">
           <button class="pill active" data-view="all">All</button>
           <button class="pill" data-view="mine">Mine</button>
-          <button class="pill" data-view="myRole">My Role</button>
+          <button class="pill" data-view="unassigned">Unassigned</button>
           <button class="pill" data-view="openP1">Open P1</button>
         </div>
       </section>
