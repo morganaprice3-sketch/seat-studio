@@ -33,11 +33,12 @@
           </label>
           <label>
             Priority
-            <select id="taskPriority">
-              <option value="P1">P1 - Critical</option>
-              <option value="P2">P2 - Important</option>
-              <option value="P3">P3 - Nice to have</option>
-            </select>
+            <div class="priority-buttons" role="group" aria-label="Task priority">
+              <button type="button" class="priority-btn active" data-priority="P1">P1 Critical</button>
+              <button type="button" class="priority-btn" data-priority="P2">P2 Important</button>
+              <button type="button" class="priority-btn" data-priority="P3">P3 Nice to have</button>
+            </div>
+            <input id="taskPriority" type="hidden" value="P1" />
           </label>
           <label>
             Assign To
@@ -46,6 +47,10 @@
           <label>
             Due
             <input id="taskDue" type="date" />
+          </label>
+          <label class="notes-field">
+            Notes
+            <textarea id="taskNotes" rows="3" placeholder="Context, dependencies, or reminders"></textarea>
           </label>
         </div>
         <div class="controls-actions">

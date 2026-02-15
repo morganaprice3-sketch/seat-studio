@@ -26,8 +26,10 @@ const els = {
   saveSnapshotBtn: document.getElementById("saveSnapshotBtn"),
   taskTitle: document.getElementById("taskTitle"),
   taskPriority: document.getElementById("taskPriority"),
+  priorityBtns: document.querySelectorAll(".priority-btn"),
   taskAssignee: document.getElementById("taskAssignee"),
   taskDue: document.getElementById("taskDue"),
+  taskNotes: document.getElementById("taskNotes"),
   addTaskBtn: document.getElementById("addTaskBtn"),
   clearAllTasksBtn: document.getElementById("clearAllTasksBtn"),
   pills: document.querySelectorAll(".pill"),
@@ -41,6 +43,11 @@ function init() {
   els.saveSnapshotBtn.addEventListener("click", saveSnapshot);
   els.addTaskBtn.addEventListener("click", addTask);
   els.clearAllTasksBtn.addEventListener("click", clearAllTasks);
+  for (const btn of els.priorityBtns) {
+    btn.addEventListener("click", () => {
+      setTaskPriority(btn.dataset.priority || "P2");
+    });
+  }
 
   for (const pill of els.pills) {
     pill.addEventListener("click", () => {
@@ -51,8 +58,17 @@ function init() {
     });
   }
 
+  setTaskPriority(els.taskPriority.value || "P1");
   renderAll();
   connectRoom();
+}
+
+function setTaskPriority(value) {
+  const priority = ["P1", "P2", "P3"].includes(value) ? value : "P2";
+  els.taskPriority.value = priority;
+  for (const btn of els.priorityBtns) {
+    btn.classList.toggle("active", btn.dataset.priority === priority);
+  }
 }
 
 function getRoomFromUrl() {
@@ -198,6 +214,7 @@ function addTask() {
     priority: els.taskPriority.value,
     assignee: els.taskAssignee.value.trim(),
     due: els.taskDue.value || "",
+    notes: els.taskNotes.value.trim(),
     done: false,
     createdAt: new Date().toISOString(),
   };
@@ -210,6 +227,8 @@ function addTask() {
   els.taskTitle.value = "";
   els.taskAssignee.value = "";
   els.taskDue.value = "";
+  els.taskNotes.value = "";
+  setTaskPriority("P1");
 }
 
 function clearAllTasks() {
@@ -251,11 +270,13 @@ function renderTaskList() {
     item.className = `task-item ${task.done ? "done" : ""}`;
 
     const due = task.due ? ` · Due ${task.due}` : "";
+    const notesHtml = task.notes ? `<p class="task-notes">${escapeHtml(task.notes)}</p>` : "";
     item.innerHTML = `
       <div class="task-main">
         <div>
           <p class="task-title">${escapeHtml(task.title)}</p>
           <p class="task-meta">${escapeHtml(task.assignee || "Unassigned")}${due}</p>
+          ${notesHtml}
         </div>
         <span class="tag ${task.priority.toLowerCase()}">${task.priority}</span>
       </div>
@@ -309,6 +330,7 @@ function normalizeState(raw) {
       priority: ["P1", "P2", "P3"].includes(t.priority) ? t.priority : "P2",
       assignee: String(t.assignee || ""),
       due: String(t.due || ""),
+      notes: String(t.notes || ""),
       done: Boolean(t.done),
       createdAt: String(t.createdAt || new Date().toISOString()),
     })),
