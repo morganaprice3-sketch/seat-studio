@@ -573,7 +573,7 @@ menu {
 @media print {
   @page {
     margin: 12mm;
-    size: portrait;
+    size: landscape;
   }
 
   body {
