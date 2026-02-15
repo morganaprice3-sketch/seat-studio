@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Focus Board</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="todo.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <p class="eyebrow">Realtime Shared Task Studio</p>
+        <h1>Event Focus Board</h1>
+        <p class="sub">A calm place to keep momentum, assign work, and stay aligned.</p>
+      </header>
+
+      <section class="card controls-card">
+        <div class="controls-grid">
+          <label>
+            Room Code
+            <input id="roomCode" type="text" placeholder="gala-2026" />
+          </label>
+          <label>
+            Your Name
+            <input id="myName" type="text" placeholder="Morgan" />
+          </label>
+          <label>
+            Your Role
+            <select id="myRole">
+              <option value="">Select role</option>
+              <option>Producer</option>
+              <option>Operations</option>
+              <option>Hospitality</option>
+              <option>Logistics</option>
+              <option>Creative</option>
+              <option>Finance</option>
+              <option>Executive</option>
+            </select>
+          </label>
+          <label>
+            Event Date
+            <input id="eventDate" type="date" />
+          </label>
+        </div>
+
+        <div class="controls-actions">
+          <button id="connectBtn" class="btn primary">Connect Room</button>
+          <button id="copyLinkBtn" class="btn">Copy Share Link</button>
+          <button id="saveSnapshotBtn" class="btn">Save Snapshot</button>
+        </div>
+
+        <p id="statusText" class="status">Disconnected</p>
+      </section>
+
+      <section class="card add-card">
+        <h2>Add Task</h2>
+        <div class="task-form-grid">
+          <label>
+            Task
+            <input id="taskTitle" type="text" placeholder="Finalize VIP arrivals script" />
+          </label>
+          <label>
+            Section
+            <select id="taskSection">
+              <option value="today">Today</option>
+              <option value="milestones">Milestones</option>
+              <option value="countdown">Countdown</option>
+            </select>
+          </label>
+          <label>
+            Priority
+            <select id="taskPriority">
+              <option value="P1">P1 - Critical</option>
+              <option value="P2">P2 - Important</option>
+              <option value="P3">P3 - Nice to have</option>
+            </select>
+          </label>
+          <label>
+            Assign To
+            <input id="taskAssignee" type="text" placeholder="Ari" />
+          </label>
+          <label>
+            Role
+            <select id="taskRole">
+              <option value="">No role</option>
+              <option>Producer</option>
+              <option>Operations</option>
+              <option>Hospitality</option>
+              <option>Logistics</option>
+              <option>Creative</option>
+              <option>Finance</option>
+              <option>Executive</option>
+            </select>
+          </label>
+          <label>
+            Due
+            <input id="taskDue" type="date" />
+          </label>
+        </div>
+        <div class="controls-actions">
+          <button id="addTaskBtn" class="btn primary">Add Task</button>
+        </div>
+      </section>
+
+      <section class="card filters-card">
+        <h2>Role-Aware View</h2>
+        <div class="view-actions">
+          <button class="pill active" data-view="all">All</button>
+          <button class="pill" data-view="mine">Mine</button>
+          <button class="pill" data-view="myRole">My Role</button>
+          <button class="pill" data-view="openP1">Open P1</button>
+        </div>
+      </section>
+
+      <section class="card spotlight-card">
+        <h2>Just One Thing</h2>
+        <div id="spotlightTask" class="spotlight-empty">No critical task yet.</div>
+      </section>
+
+      <section class="card list-card">
+        <h2>Today</h2>
+        <div id="todayList" class="task-list"></div>
+      </section>
+
+      <section class="card list-card">
+        <h2>Milestones</h2>
+        <div id="milestonesList" class="task-list"></div>
+      </section>
+
+      <section class="card list-card">
+        <h2>Countdown</h2>
+        <div id="countdownMeta" class="countdown-meta"></div>
+        <div id="countdownList" class="task-list"></div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="todo.js"></script>
+  </body>
+</html>

@@ -1,0 +1,268 @@
+:root {
+  --cream: #f7f2e8;
+  --cream-deep: #efe7d8;
+  --paper: #fffaf1;
+  --ink: #2f2a24;
+  --ink-soft: #6f6458;
+  --burnt: #be5f2f;
+  --burnt-soft: #f0d7c9;
+  --line: #e4d8c6;
+  --shadow: 0 10px 22px rgba(84, 53, 31, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 18% -18%, #fff9ef 0%, var(--cream) 56%, var(--cream-deep) 100%);
+  color: var(--ink);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.page {
+  width: min(900px, 94vw);
+  margin: 2.4rem auto 3.2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero {
+  padding: 0.2rem 0.2rem 0.7rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.1rem, 8vw, 3.4rem);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--burnt);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.73rem;
+}
+
+.sub {
+  margin: 0.45rem 0 0;
+  color: var(--ink-soft);
+}
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  font-size: clamp(1.5rem, 4.8vw, 2.2rem);
+  margin-bottom: 0.65rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fffcf6;
+  color: var(--ink);
+  padding: 0.58rem 0.62rem;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #d3a588;
+  box-shadow: 0 0 0 3px rgba(190, 95, 47, 0.14);
+}
+
+.controls-grid,
+.task-form-grid {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.controls-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.btn,
+.pill {
+  border: 1px solid #d6c5b2;
+  border-radius: 999px;
+  padding: 0.5rem 0.82rem;
+  background: #faf2e8;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.btn:hover,
+.pill:hover {
+  background: #f6ebdf;
+}
+
+.btn.primary,
+.pill.active {
+  background: var(--burnt);
+  border-color: var(--burnt);
+  color: #fff;
+}
+
+.status {
+  margin: 0.6rem 0 0;
+  color: var(--ink-soft);
+}
+
+.view-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.spotlight-card {
+  background: linear-gradient(165deg, #fff7ec, #fff1e1);
+}
+
+.spotlight-empty {
+  color: var(--ink-soft);
+}
+
+.spotlight-task {
+  border: 1px solid #edd4c0;
+  border-radius: 14px;
+  padding: 0.8rem;
+  background: #fff9f2;
+}
+
+.task-list {
+  display: grid;
+  gap: 0.62rem;
+}
+
+.task-item {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.72rem;
+  background: #fffdf9;
+  display: grid;
+  gap: 0.42rem;
+}
+
+.task-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+
+.task-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.task-meta {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+}
+
+.tag {
+  border-radius: 999px;
+  padding: 0.2rem 0.52rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  width: fit-content;
+  border: 1px solid transparent;
+}
+
+.tag.p1 {
+  background: #fbe2d4;
+  border-color: #efc4ac;
+  color: #9e4317;
+}
+
+.tag.p2 {
+  background: #f4e8d9;
+  border-color: #e5cfb3;
+  color: #89613f;
+}
+
+.tag.p3 {
+  background: #f2efe8;
+  border-color: #dbd4c8;
+  color: #6f665d;
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.48rem;
+  flex-wrap: wrap;
+}
+
+.task-btn {
+  border: 1px solid #dbcbb8;
+  border-radius: 999px;
+  background: #fcf6ee;
+  color: var(--ink-soft);
+  padding: 0.28rem 0.58rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.task-btn:hover {
+  background: #f7edde;
+}
+
+.task-item.done {
+  opacity: 0.66;
+}
+
+.countdown-meta {
+  margin: 0.1rem 0 0.8rem;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 700px) {
+  .page {
+    margin: 1.2rem auto 2rem;
+  }
+
+  .card {
+    padding: 0.85rem;
+  }
+
+  .task-main {
+    flex-direction: column;
+  }
+}

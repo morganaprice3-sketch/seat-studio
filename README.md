@@ -105,3 +105,70 @@ with check (true);
 5. Share that exact link with collaborators.
 
 Anyone on the same `?room=...` link edits in real time together, and snapshots are shared as version history for that room.
+
+## Event Focus Board (Realtime To-Do Tool)
+Files:
+- `/Users/morgan/Documents/New project/todo.html`
+- `/Users/morgan/Documents/New project/todo.css`
+- `/Users/morgan/Documents/New project/todo.js`
+
+Use:
+- `https://YOUR-DOMAIN/?room=gala-2026` for shared realtime room-based to-do collaboration.
+
+Required Supabase SQL for this tool:
+
+```sql
+create table if not exists public.event_todo_rooms (
+  code text primary key,
+  payload jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.event_todo_versions (
+  id bigint generated always as identity primary key,
+  room_code text not null,
+  label text not null,
+  snapshot jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.event_todo_rooms enable row level security;
+alter table public.event_todo_versions enable row level security;
+
+drop policy if exists "public read todo rooms" on public.event_todo_rooms;
+drop policy if exists "public write todo rooms" on public.event_todo_rooms;
+drop policy if exists "public update todo rooms" on public.event_todo_rooms;
+drop policy if exists "public read todo versions" on public.event_todo_versions;
+drop policy if exists "public write todo versions" on public.event_todo_versions;
+
+create policy "public read todo rooms"
+on public.event_todo_rooms
+for select
+to anon
+using (true);
+
+create policy "public write todo rooms"
+on public.event_todo_rooms
+for insert
+to anon
+with check (true);
+
+create policy "public update todo rooms"
+on public.event_todo_rooms
+for update
+to anon
+using (true)
+with check (true);
+
+create policy "public read todo versions"
+on public.event_todo_versions
+for select
+to anon
+using (true);
+
+create policy "public write todo versions"
+on public.event_todo_versions
+for insert
+to anon
+with check (true);
+```
