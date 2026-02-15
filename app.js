@@ -331,7 +331,7 @@ function renderBreadcrumbs() {
     const exportBtn = document.createElement("button");
     exportBtn.type = "button";
     exportBtn.className = "btn";
-    exportBtn.textContent = "Download";
+    exportBtn.textContent = "Download JSON";
     exportBtn.addEventListener("click", () => {
       downloadJson(entry.snapshot, `seat-studio-snapshot-${timestampForFile(entry.savedAt)}.json`);
     });
