@@ -6,16 +6,12 @@ const SHARED_CONFIG = {
 };
 
 const defaultState = {
-  eventDate: "",
   people: [],
   tasks: [],
 };
 
 let state = loadState();
 let currentView = "all";
-let myIdentity = {
-  name: "",
-};
 
 const collab = {
   client: null,
@@ -27,13 +23,8 @@ const collab = {
 };
 
 const els = {
-  roomCode: document.getElementById("roomCode"),
-  myName: document.getElementById("myName"),
-  eventDate: document.getElementById("eventDate"),
-  connectBtn: document.getElementById("connectBtn"),
   copyLinkBtn: document.getElementById("copyLinkBtn"),
   saveSnapshotBtn: document.getElementById("saveSnapshotBtn"),
-  statusText: document.getElementById("statusText"),
   taskTitle: document.getElementById("taskTitle"),
   taskSection: document.getElementById("taskSection"),
   taskPriority: document.getElementById("taskPriority"),
@@ -51,30 +42,9 @@ const els = {
 init();
 
 function init() {
-  const roomFromUrl = getRoomFromUrl();
-  myIdentity.name = localStorage.getItem("event-focus-my-name") || "";
-
-  els.roomCode.value = roomFromUrl;
-  els.myName.value = myIdentity.name;
-  els.eventDate.value = state.eventDate || "";
-
-  els.connectBtn.addEventListener("click", connectRoom);
   els.copyLinkBtn.addEventListener("click", copyShareLink);
   els.saveSnapshotBtn.addEventListener("click", saveSnapshot);
   els.addTaskBtn.addEventListener("click", addTask);
-
-  els.myName.addEventListener("input", () => {
-    myIdentity.name = els.myName.value.trim();
-    localStorage.setItem("event-focus-my-name", myIdentity.name);
-    renderAll();
-  });
-
-  els.eventDate.addEventListener("change", () => {
-    state.eventDate = els.eventDate.value;
-    persistState();
-    queueSync();
-    renderCountdown();
-  });
 
   for (const pill of els.pills) {
     pill.addEventListener("click", () => {
@@ -103,12 +73,11 @@ function sanitizeRoomCode(v) {
 }
 
 async function connectRoom() {
-  const roomCode = sanitizeRoomCode(els.roomCode.value || getRoomFromUrl());
+  const roomCode = getRoomFromUrl();
   if (!roomCode) return;
-  els.roomCode.value = roomCode;
 
   if (!window.supabase?.createClient) {
-    setStatus("Could not load realtime library.");
+    console.error("Could not load realtime library.");
     return;
   }
 
@@ -120,16 +89,13 @@ async function connectRoom() {
   collab.client = window.supabase.createClient(SHARED_CONFIG.supabaseUrl, SHARED_CONFIG.supabaseAnonKey);
   collab.roomCode = roomCode;
 
-  setStatus(`Connecting to room \"${roomCode}\"...`);
-
   try {
     const loaded = await fetchRoomState();
     if (!loaded) await createRoomState();
     subscribeRoom();
     collab.connected = true;
-    setStatus(`Live in room \"${roomCode}\"`);
   } catch (err) {
-    setStatus(`Connection failed: ${err.message}`);
+    console.error("Connection failed:", err.message);
   }
 }
 
@@ -154,7 +120,6 @@ async function fetchRoomState() {
 
   state = normalizeState(data.payload);
   persistState();
-  els.eventDate.value = state.eventDate || "";
   renderAll();
   return true;
 }
@@ -175,7 +140,6 @@ function subscribeRoom() {
         collab.syncing = true;
         state = normalizeState(payload.new.payload);
         persistState();
-        els.eventDate.value = state.eventDate || "";
         renderAll();
         collab.syncing = false;
       },
@@ -199,11 +163,11 @@ async function syncNow() {
 }
 
 function setStatus(text) {
-  els.statusText.textContent = text;
+  console.info(text);
 }
 
 async function copyShareLink() {
-  const roomCode = sanitizeRoomCode(els.roomCode.value || getRoomFromUrl());
+  const roomCode = getRoomFromUrl();
   const url = new URL(window.location.href);
   url.searchParams.set("room", roomCode);
   try {
@@ -276,10 +240,6 @@ function renderAll() {
 function getVisibleTasks() {
   const tasks = state.tasks;
   if (currentView === "all") return tasks;
-  if (currentView === "mine") {
-    if (!myIdentity.name) return [];
-    return tasks.filter((t) => t.assignee.toLowerCase() === myIdentity.name.toLowerCase());
-  }
   if (currentView === "unassigned") return tasks.filter((t) => !t.assignee);
   if (currentView === "openP1") {
     return tasks.filter((t) => t.priority === "P1" && !t.done);
@@ -365,24 +325,24 @@ function renderSection(section, targetEl) {
 }
 
 function renderCountdown() {
-  if (!state.eventDate) {
-    els.countdownMeta.textContent = "Set an event date to unlock countdown focus.";
+  const dueDates = state.tasks
+    .filter((t) => t.section === "countdown" && t.due && !t.done)
+    .map((t) => new Date(`${t.due}T12:00:00`))
+    .filter((d) => !Number.isNaN(d.getTime()))
+    .sort((a, b) => a - b);
+
+  if (!dueDates.length) {
+    els.countdownMeta.textContent = "Add due dates to countdown tasks to see urgency.";
     return;
   }
 
   const now = new Date();
-  const eventDate = new Date(`${state.eventDate}T12:00:00`);
-  const diff = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+  const diff = Math.ceil((dueDates[0] - now) / (1000 * 60 * 60 * 24));
 
-  if (diff > 1) {
-    els.countdownMeta.textContent = `${diff} days to event day.`;
-  } else if (diff === 1) {
-    els.countdownMeta.textContent = "1 day to event day.";
-  } else if (diff === 0) {
-    els.countdownMeta.textContent = "Event day is today.";
-  } else {
-    els.countdownMeta.textContent = `${Math.abs(diff)} days since event day.`;
-  }
+  if (diff > 1) els.countdownMeta.textContent = `${diff} days until next countdown deadline.`;
+  else if (diff === 1) els.countdownMeta.textContent = "1 day until next countdown deadline.";
+  else if (diff === 0) els.countdownMeta.textContent = "Next countdown deadline is today.";
+  else els.countdownMeta.textContent = `${Math.abs(diff)} days past next countdown deadline.`;
 }
 
 function loadState() {
@@ -398,7 +358,6 @@ function loadState() {
 function normalizeState(raw) {
   const tasks = Array.isArray(raw.tasks) ? raw.tasks : [];
   return {
-    eventDate: String(raw.eventDate || ""),
     people: Array.isArray(raw.people) ? raw.people.map(String) : [],
     tasks: tasks.map((t) => ({
       id: String(t.id || crypto.randomUUID()),
