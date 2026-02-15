@@ -39,7 +39,6 @@ const els = {
   clearSavesBtn: document.getElementById("clearSavesBtn"),
   saveBtn: document.getElementById("saveBtn"),
   exportCurrentBtn: document.getElementById("exportCurrentBtn"),
-  exportPdfBtn: document.getElementById("exportPdfBtn"),
   resetBtn: document.getElementById("resetBtn"),
   layoutTableEditor: document.getElementById("layoutTableEditor"),
   overflowTableEditor: document.getElementById("overflowTableEditor"),
@@ -102,12 +101,8 @@ els.clearSavesBtn.addEventListener("click", async () => {
 });
 
 els.exportCurrentBtn.addEventListener("click", () => {
-  downloadJson(state, `seat-studio-current-${timestampForFile()}.json`);
-  pulse(els.exportCurrentBtn, "Exported");
-});
-
-els.exportPdfBtn.addEventListener("click", () => {
   exportLayoutsPdf();
+  pulse(els.exportCurrentBtn, "Preparing PDF...");
 });
 
 els.resetBtn.addEventListener("click", () => {
