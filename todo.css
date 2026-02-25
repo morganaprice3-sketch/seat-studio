@@ -262,13 +262,17 @@ textarea:focus {
   background: rgba(28, 34, 48, 0.02);
   padding: 0.65rem;
   display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: start;
   gap: 0.5rem;
   min-height: 240px;
 }
 
 .priority-dropzone {
+  display: grid;
   min-height: 170px;
   align-content: start;
+  grid-auto-rows: max-content;
 }
 
 .priority-dropzone.drag-over {
@@ -295,6 +299,8 @@ textarea:focus {
 .task-list {
   display: grid;
   gap: 0.62rem;
+  align-content: start;
+  grid-auto-rows: max-content;
 }
 
 .task-item {
