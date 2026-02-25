@@ -9,9 +9,9 @@ const defaultState = {
   tasks: [],
 };
 const PRIORITY_LABELS = {
-  P1: "Critical",
-  P2: "Important",
-  P3: "Nice to have",
+  P1: "Wednesday",
+  P2: "Thursday",
+  P3: "Friday",
 };
 
 let state = loadState();
@@ -321,9 +321,9 @@ function renderTaskLists() {
     P2: tasks.filter((t) => t.priority === "P2"),
     P3: tasks.filter((t) => t.priority === "P3"),
   };
-  renderPriorityList(els.p1List, byPriority.P1, "No P1 tasks.");
-  renderPriorityList(els.p2List, byPriority.P2, "No P2 tasks.");
-  renderPriorityList(els.p3List, byPriority.P3, "No P3 tasks.");
+  renderPriorityList(els.p1List, byPriority.P1, "No Wednesday tasks.");
+  renderPriorityList(els.p2List, byPriority.P2, "No Thursday tasks.");
+  renderPriorityList(els.p3List, byPriority.P3, "No Friday tasks.");
 }
 
 function renderPriorityList(container, tasks, emptyText) {
