@@ -34,6 +34,7 @@ const els = {
   overflowTableCount: document.getElementById("overflowTableCount"),
   generateBtn: document.getElementById("generateBtn"),
   jumpButtons: document.querySelectorAll("[data-jump-target]"),
+  overflowJumpBtn: document.querySelector('[data-jump-target="overflowLayoutSection"]'),
   tableConfigList: document.getElementById("tableConfigList"),
   breadcrumbList: document.getElementById("breadcrumbList"),
   clearSavesBtn: document.getElementById("clearSavesBtn"),
@@ -43,6 +44,7 @@ const els = {
   layoutTableEditor: document.getElementById("layoutTableEditor"),
   overflowTableEditor: document.getElementById("overflowTableEditor"),
   roomCanvas: document.getElementById("roomCanvas"),
+  overflowLayoutSection: document.getElementById("overflowLayoutSection"),
   overflowRoomCanvas: document.getElementById("overflowRoomCanvas"),
   seatDialog: document.getElementById("seatDialog"),
   seatForm: document.getElementById("seatForm"),
@@ -153,6 +155,7 @@ els.seatForm.addEventListener("submit", (event) => {
 
 function renderAll() {
   syncControlsFromState();
+  syncOverflowLayoutVisibility();
   renderTableConfig();
   renderBreadcrumbs();
   renderLayoutTableEditor();
@@ -164,6 +167,16 @@ function renderAll() {
 function syncControlsFromState() {
   els.mainTableCount.value = state.mainTables.length;
   els.overflowTableCount.value = state.overflowTables.length;
+}
+
+function syncOverflowLayoutVisibility() {
+  const hasOverflowTables = state.overflowTables.length > 0;
+  if (els.overflowLayoutSection) {
+    els.overflowLayoutSection.style.display = hasOverflowTables ? "" : "none";
+  }
+  if (els.overflowJumpBtn) {
+    els.overflowJumpBtn.style.display = hasOverflowTables ? "" : "none";
+  }
 }
 
 function regenerateRoomTables(room, count) {
