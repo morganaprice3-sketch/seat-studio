@@ -52,6 +52,7 @@ const els = {
   p1List: document.getElementById("p1List"),
   p2List: document.getElementById("p2List"),
   p3List: document.getElementById("p3List"),
+  completedList: document.getElementById("completedList"),
   dropzones: document.querySelectorAll(".priority-dropzone"),
   editModal: document.getElementById("editModal"),
   editTaskTitleInput: document.getElementById("editTaskTitleInput"),
@@ -316,14 +317,17 @@ function getVisibleTasks() {
 
 function renderTaskLists() {
   const tasks = getVisibleTasks();
+  const openTasks = tasks.filter((t) => !t.done);
+  const completedTasks = tasks.filter((t) => t.done);
   const byPriority = {
-    P1: tasks.filter((t) => t.priority === "P1"),
-    P2: tasks.filter((t) => t.priority === "P2"),
-    P3: tasks.filter((t) => t.priority === "P3"),
+    P1: openTasks.filter((t) => t.priority === "P1"),
+    P2: openTasks.filter((t) => t.priority === "P2"),
+    P3: openTasks.filter((t) => t.priority === "P3"),
   };
   renderPriorityList(els.p1List, byPriority.P1, "No Wednesday tasks.");
   renderPriorityList(els.p2List, byPriority.P2, "No Thursday tasks.");
   renderPriorityList(els.p3List, byPriority.P3, "No Friday tasks.");
+  renderCompletedList(completedTasks);
 }
 
 function renderPriorityList(container, tasks, emptyText) {
@@ -469,6 +473,69 @@ function renderPriorityList(container, tasks, emptyText) {
     });
 
     actions.append(editBtn, doneBtn, delBtn);
+    item.append(actions);
+    container.append(item);
+  }
+}
+
+function renderCompletedList(tasks) {
+  const container = els.completedList;
+  container.innerHTML = "";
+  if (!tasks.length) {
+    const empty = document.createElement("p");
+    empty.className = "task-meta";
+    empty.textContent = "No completed tasks yet.";
+    container.append(empty);
+    return;
+  }
+
+  for (const task of tasks) {
+    const item = document.createElement("article");
+    item.className = "task-item done";
+
+    const notesHtml = task.notes ? `<p class="task-notes">${escapeHtml(task.notes)}</p>` : "";
+    item.innerHTML = `
+      <div class="task-main">
+        <div>
+          <p class="task-title">${escapeHtml(task.title)}</p>
+          <p class="task-meta">${escapeHtml(task.assignee || "Unassigned")}</p>
+          ${notesHtml}
+        </div>
+        <span class="tag ${task.priority.toLowerCase()}">${getPriorityLabel(task.priority)}</span>
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
+
+    const reopenBtn = document.createElement("button");
+    reopenBtn.className = "task-btn";
+    reopenBtn.textContent = "Mark Open";
+    reopenBtn.addEventListener("click", () => {
+      task.done = false;
+      persistState();
+      queueSync();
+      renderAll();
+    });
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "task-btn";
+    delBtn.textContent = "Delete";
+    delBtn.addEventListener("click", () => {
+      state.tasks = state.tasks.filter((t) => t.id !== task.id);
+      persistState();
+      queueSync();
+      renderAll();
+    });
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "task-btn";
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", () => {
+      editTask(task.id);
+    });
+
+    actions.append(editBtn, reopenBtn, delBtn);
     item.append(actions);
     container.append(item);
   }

@@ -256,6 +256,16 @@ textarea:focus {
   margin-top: 1rem;
 }
 
+.completed-section {
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(28, 34, 48, 0.02);
+  padding: 0.7rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
 .priority-column {
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -396,7 +406,9 @@ textarea:focus {
 }
 
 .task-item.done {
-  opacity: 0.66;
+  opacity: 1;
+  background: rgba(86, 162, 109, 0.16);
+  border-color: rgba(86, 162, 109, 0.55);
 }
 
 .celebration-piece {
