@@ -316,7 +316,7 @@ textarea {
 
 .room-canvas {
   margin-top: 0.9rem;
-  min-height: 560px;
+  min-height: 760px;
   position: relative;
   overflow: hidden;
   border: 1px solid #cfd5e3;
@@ -523,7 +523,7 @@ menu {
   }
 
   .room-canvas {
-    min-height: 430px;
+    min-height: 620px;
   }
 
   .stage-marker {
