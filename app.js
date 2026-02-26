@@ -40,6 +40,7 @@ const els = {
   clearSavesBtn: document.getElementById("clearSavesBtn"),
   saveBtn: document.getElementById("saveBtn"),
   exportCurrentBtn: document.getElementById("exportCurrentBtn"),
+  exportTableSetupBtn: document.getElementById("exportTableSetupBtn"),
   resetBtn: document.getElementById("resetBtn"),
   layoutTableEditor: document.getElementById("layoutTableEditor"),
   overflowTableEditor: document.getElementById("overflowTableEditor"),
@@ -105,6 +106,11 @@ els.clearSavesBtn.addEventListener("click", async () => {
 els.exportCurrentBtn.addEventListener("click", () => {
   exportLayoutsPdf();
   pulse(els.exportCurrentBtn, "Preparing PDF...");
+});
+
+els.exportTableSetupBtn.addEventListener("click", () => {
+  exportTableSetupCsv();
+  pulse(els.exportTableSetupBtn, "Exported CSV");
 });
 
 els.resetBtn.addEventListener("click", () => {
@@ -1008,6 +1014,48 @@ function downloadJson(payload, filename) {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+}
+
+function downloadCsv(rows, filename) {
+  const csv = rows.map((row) => row.map(csvEscape).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function csvEscape(value) {
+  const text = String(value ?? "");
+  if (/[",\n]/.test(text)) return `"${text.replaceAll('"', '""')}"`;
+  return text;
+}
+
+function exportTableSetupCsv() {
+  const rows = [["Room", "Table Number", "Table Name", "Guest Count", "Notes"]];
+  for (const table of state.mainTables) {
+    rows.push([
+      "Main Room",
+      getDisplayTableNumber("main", table.id),
+      table.name || "",
+      table.seatCount,
+      table.notes || "",
+    ]);
+  }
+  for (const table of state.overflowTables) {
+    rows.push([
+      "Overflow Room",
+      getDisplayTableNumber("overflow", table.id),
+      table.name || "",
+      table.seatCount,
+      table.notes || "",
+    ]);
+  }
+  downloadCsv(rows, `seat-studio-table-setup-${timestampForFile()}.csv`);
 }
 
 function timestampForFile(dateString = null) {
