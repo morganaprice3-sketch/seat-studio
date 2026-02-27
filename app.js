@@ -628,23 +628,7 @@ function renderLayoutTableEditor(focusName = false) {
   nameLabel.append(nameInput);
   mainEditorNameInput = nameInput;
 
-  const seatsLabel = document.createElement("label");
-  seatsLabel.textContent = "Guest Count";
-  const seatsInput = document.createElement("input");
-  seatsInput.type = "number";
-  seatsInput.min = String(MIN_SEATS);
-  seatsInput.max = String(MAX_SEATS);
-  seatsInput.value = String(table.seatCount);
-  seatsInput.addEventListener("change", () => {
-    const nextCount = clampInt(seatsInput.value, MIN_SEATS, MAX_SEATS);
-    table.seatCount = nextCount;
-    table.assignments = resizeAssignments(table.assignments, nextCount);
-    renderAll();
-    persistState();
-  });
-  seatsLabel.append(seatsInput);
-
-  grid.append(numberLabel, nameLabel, seatsLabel);
+  grid.append(numberLabel, nameLabel);
   card.append(heading, grid);
   els.layoutTableEditor.append(card);
 
@@ -715,23 +699,7 @@ function renderOverflowTableEditor(focusName = false) {
   nameLabel.append(nameInput);
   overflowEditorNameInput = nameInput;
 
-  const seatsLabel = document.createElement("label");
-  seatsLabel.textContent = "Guest Count";
-  const seatsInput = document.createElement("input");
-  seatsInput.type = "number";
-  seatsInput.min = String(MIN_SEATS);
-  seatsInput.max = String(MAX_SEATS);
-  seatsInput.value = String(table.seatCount);
-  seatsInput.addEventListener("change", () => {
-    const nextCount = clampInt(seatsInput.value, MIN_SEATS, MAX_SEATS);
-    table.seatCount = nextCount;
-    table.assignments = resizeAssignments(table.assignments, nextCount);
-    renderAll();
-    persistState();
-  });
-  seatsLabel.append(seatsInput);
-
-  grid.append(numberLabel, nameLabel, seatsLabel);
+  grid.append(numberLabel, nameLabel);
   card.append(heading, grid);
   els.overflowTableEditor.append(card);
 
