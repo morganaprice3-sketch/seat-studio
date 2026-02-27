@@ -469,6 +469,12 @@ textarea {
   color: #d6dff0;
 }
 
+.table-guests {
+  font-size: 0.54rem;
+  font-weight: 600;
+  color: #c8d4ea;
+}
+
 .seat-dot {
   position: absolute;
   width: 18px;

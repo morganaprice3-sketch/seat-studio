@@ -479,7 +479,7 @@ function renderLayoutCanvas({ canvasEl, tables, doorways, selectedId, markerType
     const tag = document.createElement("span");
     tag.className = "table-tag";
     const shortName = table.name.length > 11 ? `${table.name.slice(0, 10)}...` : table.name;
-    tag.innerHTML = `${displayNumber}<span class="table-name">${escapeHtml(shortName)}</span>`;
+    tag.innerHTML = `${displayNumber}<span class="table-name">${escapeHtml(shortName)}</span><span class="table-guests">${table.seatCount} guests</span>`;
     tableNode.append(tag);
 
     tableNode.addEventListener("mousedown", (event) =>
