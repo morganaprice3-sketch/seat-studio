@@ -365,6 +365,27 @@ textarea {
   left: calc(50% + 222px);
 }
 
+.doorway-node {
+  position: absolute;
+  width: 126px;
+  height: 34px;
+  border: 1px dashed #8e9fbf;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--navy-800);
+  display: grid;
+  place-items: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: grab;
+  user-select: none;
+}
+
+.doorway-node:active {
+  cursor: grabbing;
+}
+
 .overflow-display-marker {
   position: absolute;
   width: 280px;
@@ -543,6 +564,12 @@ menu {
 
   .display-marker.right {
     left: calc(50% + 108px);
+  }
+
+  .doorway-node {
+    width: 92px;
+    height: 30px;
+    font-size: 0.52rem;
   }
 
   .overflow-display-marker {

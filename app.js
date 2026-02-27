@@ -14,6 +14,7 @@ const MAX_SEATS = 12;
 const defaultState = {
   mainTables: [],
   overflowTables: [],
+  mainDoorways: [],
   guests: [],
   nextGuestId: 1,
 };
@@ -68,6 +69,9 @@ let overflowEditorNameInput = null;
 if (!state.mainTables.length && !state.overflowTables.length) {
   regenerateRoomTables("main", 12);
   regenerateRoomTables("overflow", 6);
+}
+if (!Array.isArray(state.mainDoorways) || state.mainDoorways.length !== 2) {
+  state.mainDoorways = getDefaultMainDoorways();
 }
 
 syncControlsFromState();
@@ -381,6 +385,7 @@ function renderRoomLayout() {
   renderLayoutCanvas({
     canvasEl: els.roomCanvas,
     tables: state.mainTables,
+    doorways: state.mainDoorways,
     selectedId: selectedMainTableId,
     markerType: "main",
     onSelect: (tableId, focusEditor = false) => {
@@ -396,6 +401,7 @@ function renderOverflowRoomLayout() {
   renderLayoutCanvas({
     canvasEl: els.overflowRoomCanvas,
     tables: state.overflowTables,
+    doorways: [],
     selectedId: selectedOverflowTableId,
     markerType: "overflow",
     onSelect: (tableId, focusEditor = false) => {
@@ -407,7 +413,7 @@ function renderOverflowRoomLayout() {
   });
 }
 
-function renderLayoutCanvas({ canvasEl, tables, selectedId, markerType, onSelect, rerender }) {
+function renderLayoutCanvas({ canvasEl, tables, doorways, selectedId, markerType, onSelect, rerender }) {
   if (!canvasEl) return;
   canvasEl.innerHTML = "";
 
@@ -425,6 +431,18 @@ function renderLayoutCanvas({ canvasEl, tables, selectedId, markerType, onSelect
     rightDisplay.textContent = "TV DISPLAY";
 
     canvasEl.append(stage, leftDisplay, rightDisplay);
+
+    for (const doorway of doorways) {
+      const doorwayNode = document.createElement("div");
+      doorwayNode.className = "doorway-node";
+      doorwayNode.style.left = `${doorway.x}%`;
+      doorwayNode.style.top = `${doorway.y}%`;
+      doorwayNode.textContent = doorway.label;
+      doorwayNode.addEventListener("mousedown", (event) =>
+        startDrag(event, doorway, { canvasEl, rerender, minYPercent: 0 }),
+      );
+      canvasEl.append(doorwayNode);
+    }
   } else {
     const display = document.createElement("div");
     display.className = "overflow-display-marker";
@@ -493,7 +511,7 @@ function renderLayoutCanvas({ canvasEl, tables, selectedId, markerType, onSelect
   }
 }
 
-function startDrag(event, table, dragOptions) {
+function startDrag(event, targetEntity, dragOptions) {
   if (event.target.classList.contains("seat-dot")) return;
 
   const canvasRect = dragOptions.canvasEl.getBoundingClientRect();
@@ -501,11 +519,14 @@ function startDrag(event, table, dragOptions) {
   const nodeRect = node.getBoundingClientRect();
 
   dragging = {
-    table,
+    targetEntity,
     canvasRect,
     rerender: dragOptions.rerender,
     deltaX: event.clientX - nodeRect.left,
     deltaY: event.clientY - nodeRect.top,
+    itemWidth: nodeRect.width,
+    itemHeight: nodeRect.height,
+    minYPercent: typeof dragOptions.minYPercent === "number" ? dragOptions.minYPercent : 8,
   };
   didDrag = false;
 
@@ -519,14 +540,14 @@ function onDragMove(event) {
   const xPx = event.clientX - dragging.canvasRect.left - dragging.deltaX;
   const yPx = event.clientY - dragging.canvasRect.top - dragging.deltaY;
 
-  const maxX = dragging.canvasRect.width - 92;
-  const maxY = dragging.canvasRect.height - 92;
+  const maxX = Math.max(1, dragging.canvasRect.width - dragging.itemWidth);
+  const maxY = Math.max(1, dragging.canvasRect.height - dragging.itemHeight);
 
   const left = clampFloat((xPx / maxX) * 94, 0, 94);
-  const top = clampFloat((yPx / maxY) * 94, 8, 94);
+  const top = clampFloat((yPx / maxY) * 94, dragging.minYPercent, 94);
 
-  dragging.table.x = left;
-  dragging.table.y = top;
+  dragging.targetEntity.x = left;
+  dragging.targetEntity.y = top;
   didDrag = true;
   dragging.rerender();
 }
@@ -974,6 +995,7 @@ function normalizeState(rawState) {
       : [];
   const rawOverflow = Array.isArray(rawState.overflowTables) ? rawState.overflowTables : [];
   const guests = Array.isArray(rawState.guests) ? rawState.guests : [];
+  const rawDoorways = Array.isArray(rawState.mainDoorways) ? rawState.mainDoorways : [];
   const seatFallback = clampInt(rawState.seatsPerTable ?? 10, MIN_SEATS, MAX_SEATS);
 
   const normalizeTables = (tables) =>
@@ -995,6 +1017,7 @@ function normalizeState(rawState) {
   return {
     mainTables: normalizeTables(rawMain),
     overflowTables: normalizeTables(rawOverflow),
+    mainDoorways: normalizeDoorways(rawDoorways),
     guests: guests.map((guest, idx) => ({
       id: clampInt(guest.id ?? idx + 1, 1, Number.MAX_SAFE_INTEGER),
       name: String(guest.name || "").trim(),
@@ -1002,6 +1025,27 @@ function normalizeState(rawState) {
     })),
     nextGuestId: clampInt(rawState.nextGuestId ?? guests.length + 1, 1, Number.MAX_SAFE_INTEGER),
   };
+}
+
+function getDefaultMainDoorways() {
+  return [
+    { id: "door-1", label: "DOORWAY 1", x: 10, y: 84 },
+    { id: "door-2", label: "DOORWAY 2", x: 74, y: 84 },
+  ];
+}
+
+function normalizeDoorways(rawDoorways) {
+  const defaults = getDefaultMainDoorways();
+  if (!Array.isArray(rawDoorways) || !rawDoorways.length) return defaults;
+  return defaults.map((fallback, idx) => {
+    const source = rawDoorways[idx] || {};
+    return {
+      id: String(source.id || fallback.id),
+      label: String(source.label || fallback.label),
+      x: clampFloat(source.x ?? fallback.x, 0, 94),
+      y: clampFloat(source.y ?? fallback.y, 0, 94),
+    };
+  });
 }
 
 function downloadJson(payload, filename) {
