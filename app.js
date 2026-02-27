@@ -201,6 +201,11 @@ function regenerateRoomTables(room, count) {
       old.seatCount = clampInt(old.seatCount ?? old.assignments?.length ?? 10, MIN_SEATS, MAX_SEATS);
       old.assignments = resizeAssignments(old.assignments || [], old.seatCount);
       old.name = String(old.name || `Table ${id}`).trim() || `Table ${id}`;
+      old.tableNumber = clampInt(
+        old.tableNumber ?? getDisplayTableNumber(room, id),
+        1,
+        9999,
+      );
       old.notes = String(old.notes || "");
       old.x = clampFloat(old.x, 0, 94);
       old.y = clampFloat(old.y, 8, 94);
@@ -211,6 +216,7 @@ function regenerateRoomTables(room, count) {
     const pos = getAutoLayoutPosition(i, Math.max(count, 1));
     newTables.push({
       id,
+      tableNumber: getDisplayTableNumber(room, id),
       name: `Table ${getDisplayTableNumber(room, id)}`,
       notes: "",
       seatCount: 10,
@@ -249,7 +255,7 @@ function renderTableConfig() {
 
 function appendRoomConfig(roomLabel, tables, roomKey) {
   for (const table of tables) {
-    const displayNumber = getDisplayTableNumber(roomKey, table.id);
+    const displayNumber = getDisplayTableNumber(roomKey, table.id, table);
     const card = document.createElement("article");
     card.className = "table-config-card";
 
@@ -461,7 +467,7 @@ function renderLayoutCanvas({ canvasEl, tables, doorways, selectedId, markerType
 
   for (const table of tables) {
     const roomKey = markerType === "main" ? "main" : "overflow";
-    const displayNumber = getDisplayTableNumber(roomKey, table.id);
+    const displayNumber = getDisplayTableNumber(roomKey, table.id, table);
     const tableNode = document.createElement("div");
     tableNode.className = "table-node";
     if (table.id === selectedId) tableNode.classList.add("selected");
@@ -582,10 +588,26 @@ function renderLayoutTableEditor(focusName = false) {
   const grid = document.createElement("div");
   grid.className = "layout-editor-grid";
 
+  const numberLabel = document.createElement("label");
+  numberLabel.textContent = "Table Number";
+  const numberInput = document.createElement("input");
+  numberInput.type = "number";
+  numberInput.min = "1";
+  numberInput.max = "9999";
+  numberInput.value = String(getDisplayTableNumber("main", table.id, table));
+  numberInput.addEventListener("change", () => {
+    table.tableNumber = clampInt(numberInput.value, 1, 9999);
+    numberInput.value = String(table.tableNumber);
+    renderTableConfig();
+    renderRoomLayout();
+    persistState();
+  });
+  numberLabel.append(numberInput);
+
   const nameLabel = document.createElement("label");
   nameLabel.textContent = "Table Name";
   const nameInput = document.createElement("input");
-  const displayNumber = getDisplayTableNumber("main", table.id);
+  const displayNumber = getDisplayTableNumber("main", table.id, table);
   nameInput.type = "text";
   nameInput.value = table.name;
   nameInput.placeholder = `Table ${displayNumber}`;
@@ -617,7 +639,7 @@ function renderLayoutTableEditor(focusName = false) {
   });
   seatsLabel.append(seatsInput);
 
-  grid.append(nameLabel, seatsLabel);
+  grid.append(numberLabel, nameLabel, seatsLabel);
   card.append(heading, grid);
   els.layoutTableEditor.append(card);
 
@@ -648,10 +670,26 @@ function renderOverflowTableEditor(focusName = false) {
   const grid = document.createElement("div");
   grid.className = "layout-editor-grid";
 
+  const numberLabel = document.createElement("label");
+  numberLabel.textContent = "Table Number";
+  const numberInput = document.createElement("input");
+  numberInput.type = "number";
+  numberInput.min = "1";
+  numberInput.max = "9999";
+  numberInput.value = String(getDisplayTableNumber("overflow", table.id, table));
+  numberInput.addEventListener("change", () => {
+    table.tableNumber = clampInt(numberInput.value, 1, 9999);
+    numberInput.value = String(table.tableNumber);
+    renderTableConfig();
+    renderOverflowRoomLayout();
+    persistState();
+  });
+  numberLabel.append(numberInput);
+
   const nameLabel = document.createElement("label");
   nameLabel.textContent = "Table Name";
   const nameInput = document.createElement("input");
-  const displayNumber = getDisplayTableNumber("overflow", table.id);
+  const displayNumber = getDisplayTableNumber("overflow", table.id, table);
   nameInput.type = "text";
   nameInput.value = table.name;
   nameInput.placeholder = `Table ${displayNumber}`;
@@ -683,7 +721,7 @@ function renderOverflowTableEditor(focusName = false) {
   });
   seatsLabel.append(seatsInput);
 
-  grid.append(nameLabel, seatsLabel);
+  grid.append(numberLabel, nameLabel, seatsLabel);
   card.append(heading, grid);
   els.overflowTableEditor.append(card);
 
@@ -1003,8 +1041,14 @@ function normalizeState(rawState) {
       const id = clampInt(table.id ?? idx + 1, 1, 1000);
       const seatCount = clampInt(table.seatCount ?? table.assignments?.length ?? seatFallback, MIN_SEATS, MAX_SEATS);
       const autoPos = getAutoLayoutPosition(idx, Math.max(tables.length, 1));
+      const roomKey = tables === rawMain ? "main" : "overflow";
       return {
         id,
+        tableNumber: clampInt(
+          table.tableNumber ?? getDisplayTableNumber(roomKey, id),
+          1,
+          9999,
+        ),
         name: String(table.name || `Table ${id}`).trim() || `Table ${id}`,
         notes: String(table.notes || ""),
         x: clampFloat(table.x ?? autoPos.x, 0, 94),
@@ -1084,7 +1128,7 @@ function exportTableSetupCsv() {
   for (const table of state.mainTables) {
     rows.push([
       "Main Room",
-      getDisplayTableNumber("main", table.id),
+      getDisplayTableNumber("main", table.id, table),
       table.name || "",
       table.seatCount,
       table.notes || "",
@@ -1093,7 +1137,7 @@ function exportTableSetupCsv() {
   for (const table of state.overflowTables) {
     rows.push([
       "Overflow Room",
-      getDisplayTableNumber("overflow", table.id),
+      getDisplayTableNumber("overflow", table.id, table),
       table.name || "",
       table.seatCount,
       table.notes || "",
@@ -1156,7 +1200,12 @@ function getAutoLayoutPosition(index, count) {
   };
 }
 
-function getDisplayTableNumber(room, localId) {
+function getDisplayTableNumber(room, localId, table = null) {
+  const asNumber =
+    table && Number.isFinite(Number(table.tableNumber))
+      ? clampInt(table.tableNumber, 1, 9999)
+      : null;
+  if (asNumber) return asNumber;
   if (room === "main") return localId;
   return state.mainTables.length + localId;
 }
