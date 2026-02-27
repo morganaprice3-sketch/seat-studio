@@ -595,12 +595,17 @@ function renderLayoutTableEditor(focusName = false) {
   numberInput.min = "1";
   numberInput.max = "9999";
   numberInput.value = String(getDisplayTableNumber("main", table.id, table));
-  numberInput.addEventListener("change", () => {
-    table.tableNumber = clampInt(numberInput.value, 1, 9999);
-    numberInput.value = String(table.tableNumber);
+  numberInput.addEventListener("input", () => {
+    const typed = Number.parseInt(numberInput.value, 10);
+    if (Number.isNaN(typed)) return;
+    table.tableNumber = clampInt(typed, 1, 9999);
     renderTableConfig();
     renderRoomLayout();
     persistState();
+  });
+  numberInput.addEventListener("blur", () => {
+    table.tableNumber = clampInt(numberInput.value, 1, 9999);
+    numberInput.value = String(table.tableNumber);
   });
   numberLabel.append(numberInput);
 
@@ -677,12 +682,17 @@ function renderOverflowTableEditor(focusName = false) {
   numberInput.min = "1";
   numberInput.max = "9999";
   numberInput.value = String(getDisplayTableNumber("overflow", table.id, table));
-  numberInput.addEventListener("change", () => {
-    table.tableNumber = clampInt(numberInput.value, 1, 9999);
-    numberInput.value = String(table.tableNumber);
+  numberInput.addEventListener("input", () => {
+    const typed = Number.parseInt(numberInput.value, 10);
+    if (Number.isNaN(typed)) return;
+    table.tableNumber = clampInt(typed, 1, 9999);
     renderTableConfig();
     renderOverflowRoomLayout();
     persistState();
+  });
+  numberInput.addEventListener("blur", () => {
+    table.tableNumber = clampInt(numberInput.value, 1, 9999);
+    numberInput.value = String(table.tableNumber);
   });
   numberLabel.append(numberInput);
 
