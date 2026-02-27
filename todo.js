@@ -9,9 +9,9 @@ const defaultState = {
   tasks: [],
 };
 const PRIORITY_LABELS = {
-  P1: "Wednesday",
-  P2: "Thursday",
-  P3: "Friday",
+  P1: "Friday",
+  P2: "Saturday",
+  P3: "Sunday",
 };
 
 let state = loadState();
@@ -324,9 +324,9 @@ function renderTaskLists() {
     P2: openTasks.filter((t) => t.priority === "P2"),
     P3: openTasks.filter((t) => t.priority === "P3"),
   };
-  renderPriorityList(els.p1List, byPriority.P1, "No Wednesday tasks.");
-  renderPriorityList(els.p2List, byPriority.P2, "No Thursday tasks.");
-  renderPriorityList(els.p3List, byPriority.P3, "No Friday tasks.");
+  renderPriorityList(els.p1List, byPriority.P1, "No Friday tasks.");
+  renderPriorityList(els.p2List, byPriority.P2, "No Saturday tasks.");
+  renderPriorityList(els.p3List, byPriority.P3, "No Sunday tasks.");
   renderCompletedList(completedTasks);
 }
 
@@ -343,6 +343,8 @@ function renderPriorityList(container, tasks, emptyText) {
   for (const task of tasks) {
     const item = document.createElement("article");
     item.className = `task-item ${task.done ? "done" : ""}`;
+    item.dataset.taskId = task.id;
+    item.dataset.priority = task.priority;
     item.draggable = true;
     item.addEventListener("dragstart", (event) => {
       event.dataTransfer?.setData("text/plain", task.id);
@@ -350,6 +352,21 @@ function renderPriorityList(container, tasks, emptyText) {
     });
     item.addEventListener("dragend", () => {
       item.classList.remove("dragging");
+    });
+    item.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      item.classList.add("drag-over");
+    });
+    item.addEventListener("dragleave", () => {
+      item.classList.remove("drag-over");
+    });
+    item.addEventListener("drop", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      item.classList.remove("drag-over");
+      const sourceTaskId = event.dataTransfer?.getData("text/plain");
+      if (!sourceTaskId) return;
+      moveTaskRelative(sourceTaskId, task.id, task.priority);
     });
     item.addEventListener(
       "touchstart",
@@ -618,6 +635,22 @@ function moveTaskPriority(taskId, nextPriority) {
   const task = state.tasks.find((t) => t.id === taskId);
   if (!task || task.priority === nextPriority) return;
   task.priority = nextPriority;
+  persistState();
+  queueSync();
+  renderAll();
+}
+
+function moveTaskRelative(sourceTaskId, targetTaskId, targetPriority) {
+  if (!sourceTaskId || !targetTaskId || sourceTaskId === targetTaskId) return;
+  const sourceIndex = state.tasks.findIndex((t) => t.id === sourceTaskId);
+  const targetIndex = state.tasks.findIndex((t) => t.id === targetTaskId);
+  if (sourceIndex < 0 || targetIndex < 0) return;
+
+  const [sourceTask] = state.tasks.splice(sourceIndex, 1);
+  sourceTask.priority = targetPriority;
+
+  const adjustedTargetIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
+  state.tasks.splice(adjustedTargetIndex, 0, sourceTask);
   persistState();
   queueSync();
   renderAll();

@@ -331,6 +331,11 @@ textarea:focus {
   box-shadow: 0 12px 22px rgba(28, 34, 48, 0.18);
 }
 
+.task-item.drag-over {
+  outline: 2px dashed var(--accent);
+  outline-offset: 3px;
+}
+
 .task-main {
   display: flex;
   justify-content: space-between;
