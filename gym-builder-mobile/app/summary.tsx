@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   row: { paddingVertical: 20 },
   divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
   section: { fontSize: 12, fontWeight: '700', letterSpacing: 1.1, textTransform: 'uppercase', color: colors.muted },
-  exercise: { marginTop: 6, fontSize: 20, lineHeight: 25, fontWeight: '650', color: colors.text },
+  exercise: { marginTop: 6, fontSize: 20, lineHeight: 25, fontWeight: '600', color: colors.text },
   core: { marginTop: 7, fontSize: 14, lineHeight: 20, color: colors.muted },
   footer: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 30, backgroundColor: colors.background, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
   primary: { height: 58, borderRadius: 18, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
