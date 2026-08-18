@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   card: { minHeight: 132, padding: 20, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, justifyContent: 'center' },
   pressed: { transform: [{ scale: 0.985 }], opacity: 0.86 },
   eyebrow: { fontSize: 12, fontWeight: '700', letterSpacing: 1.2, color: colors.muted, textTransform: 'uppercase', marginBottom: 8 },
-  cardTitle: { fontSize: 27, fontWeight: '650', letterSpacing: -0.7, color: colors.text },
+  cardTitle: { fontSize: 27, fontWeight: '600', letterSpacing: -0.7, color: colors.text },
   cardDetail: { marginTop: 6, fontSize: 15, lineHeight: 20, color: colors.muted, paddingRight: 40 },
   arrow: { position: 'absolute', right: 20, bottom: 20, fontSize: 27, color: colors.text }
 });
