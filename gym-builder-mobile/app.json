@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Gym Builder",
+    "slug": "gym-builder",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "gymbuilder",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.morganprice.gymbuilder"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4afbb659-4186-4c5a-aba6-6e64c3766e42"
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+name: Gym Builder Mobile Check
+
+on:
+  pull_request:
+    paths:
+      - 'gym-builder-mobile/**'
+      - '.github/workflows/gym-builder-mobile-check.yml'
+  push:
+    branches:
+      - 'agent/gym-builder-ios'
+    paths:
+      - 'gym-builder-mobile/**'
+      - '.github/workflows/gym-builder-mobile-check.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gym-builder-mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: gym-builder-mobile/package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Expo doctor
+        run: npx expo-doctor
+
+      - name: Typecheck
+        run: npm run typecheck

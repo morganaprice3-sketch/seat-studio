@@ -1,0 +1,10 @@
+name: Build Gym Builder for iPhone
+
+jobs:
+  build_ios_preview:
+    name: Build iOS preview
+    type: build
+    params:
+      platform: ios
+      profile: preview
+      refresh_ad_hoc_provisioning_profile: true
